@@ -1,0 +1,262 @@
+import random
+import asyncio
+import core.account
+from discord_webhook.webhook import DiscordWebhook
+from discord.ext import commands
+from games import tictactoe, wumpus, minesweeper, twenty
+from core.classes import Cog_Extension
+from discord import Embed
+from discord_components import DiscordComponents, Button, ButtonStyle
+from asyncio import TimeoutError, sleep
+from random import choice
+from config import *
+
+class Game(Cog_Extension):
+    @commands.command(name="老虎機", aliases=['slots', 'bet'])
+    @commands.cooldown(rate=1, per=3.0, type=commands.BucketType.user)
+    async def slot(self, ctx):
+        """ Roll the slot machine """
+        emojis = "🍎🍊🍐🍋🍉🍇🍓🍒"
+        a = random.choice(emojis)
+        b = random.choice(emojis)
+        c = random.choice(emojis)
+
+        slotmachine = f"**[ {a} {b} {c} ]\n{ctx.author.name}**,"
+
+        if a == b == c:
+            await ctx.send(f"{slotmachine} All matching, you won! 🎉")
+        elif (a == b) or (a == c) or (b == c):
+            await ctx.send(f"{slotmachine} 2 in a row, you won! 🎉")
+        else:
+            await ctx.send(f"{slotmachine} No match, you lost 😢")
+            
+    @commands.command(name='toss', aliases=['flip'])
+    async def cointoss(self, ctx):
+        embed = Embed(
+            color=0xF5F5F5,
+            title=f"🪙 {ctx.author.name} 擲硬幣🪙",
+            description="點擊按紐選擇正面或反面！",
+        )
+
+        menu_components = [
+            [
+                Button(style=ButtonStyle.grey, label="正面"),
+                Button(style=ButtonStyle.grey, label="反面"),
+            ]
+        ]
+        heads_components = [
+            [
+                Button(style=ButtonStyle.green, label="正面", disabled=True),
+                Button(style=ButtonStyle.red, label="反面", disabled=True),
+            ],
+            Button(style=ButtonStyle.blue, label="再玩一次?", disabled=False),
+        ]
+        tails_components = [
+            [
+                Button(style=ButtonStyle.red, label="正面", disabled=True),
+                Button(style=ButtonStyle.green, label="反面", disabled=True),
+            ],
+            Button(style=ButtonStyle.blue, label="再玩一次?", disabled=False),
+        ]
+
+        if ctx.author.id in self.session_message:
+            msg = self.session_message[ctx.author.id]
+            await msg.edit(embed=embed, components=menu_components)
+        else:
+            msg = await ctx.send(embed=embed, components=menu_components)
+            self.session_message[ctx.author.id] = msg
+
+        def check(res):
+            return res.user.id == ctx.author.id and res.channel.id == ctx.channel.id
+
+        try:
+            res = await self.bot.wait_for("button_click", check=check, timeout=10)
+        except TimeoutError:
+            await msg.edit(
+                embed=Embed(color=0xED564E, title="時間到!", description="沒有人回應。 ☹️"),
+                components=[
+                    Button(style=ButtonStyle.red, label="已超時!", disabled=True)
+                ],
+            )
+            return
+
+        await res.respond(
+            type=7,
+            embed=Embed(
+                color=0xF5F5F5,
+                title=f"🪙 {ctx.author.name}擲硬幣 🪙",
+                description=f"你選擇了 **{res.component.label.lower()}**!",
+            ),
+            components=menu_components,
+        )
+
+        game_choice = choice(["正面", "反面"])
+        await sleep(1)
+
+        if game_choice == res.component.label:
+            embed = Embed(
+                color=0x65DD65,
+                title=f"🪙 {ctx.author.name}擲硬幣 🪙",
+                description=f"你選擇了 **{res.component.label.lower()}**!\n\n> **你贏了！**",
+            )
+        else:
+            embed = Embed(
+                color=0xED564E,
+                title=f"🪙 {ctx.author.name}擲硬幣 🪙",
+                description=f"你選擇了 **{res.component.label.lower()}**!\n\n> 你輸了",
+            )
+
+        await msg.edit(
+            embed=embed,
+            components=tails_components if game_choice == "反面" else heads_components,
+        )
+
+        try:
+            res = await self.bot.wait_for("button_click", check=check, timeout=10)
+        except TimeoutError:
+            await msg.delete()
+            del self.session_message[ctx.author.id]
+            return
+
+        await res.respond(type=6)
+        if res.component.label == "再玩一次?":
+            self.session_message[ctx.author.id] = msg
+            await self.cointoss(ctx)
+
+
+    @commands.command(name='numgame', aliases=['nungame','num'])
+    async def numgame(self, ctx):
+      if core.account.bal(ctx.author.id) is None:
+          await ctx.send("請參照此格式 `Creg`開戶。")
+          return
+
+      await ctx.send('猜一個數字在壹到壹佰之間。')
+
+      answer = random.randint(1, 100)
+      guessnumber = 0
+
+      def guess_check(m):
+          return m.content.isdigit() and m.author == ctx.message.author
+      while guessnumber < 6:
+          guessnumber = guessnumber + 1
+
+          try:
+              guess = await self.bot.wait_for('message', check=guess_check, timeout=10.0)
+          except asyncio.TimeoutError:
+              fmt = '你花了太久時間了。答案是{}。'
+              await ctx.send(fmt.format(answer))
+              break
+          else:
+              await ctx.send(core.account.numgame(ctx.message.author.id, int(guess.content), guessnumber, answer))
+
+          if int(guess.content) == answer:
+              break
+    @commands.command(name='roulette', aliases=['輪盤','RL'])
+    async def roulette(self, ctx):
+
+        answer = None
+        while answer not in ('是', '否'):
+            webhook = DiscordWebhook(url='https://discord.com/api/webhooks/847789988602183720/RVEzJMCjnMUCp8ToD0iIYC6DrwQUNVh1l0ZCZSk4Pu7Eych237rTZhzZNOvGO_GXWp7D', content='你確定要這麼做嗎？如果你失手，那麼你所有的錢都會消失。 （是或否）')
+            webhook.execute()
+
+            def check(m):
+                return m.author == ctx.message.author
+
+            try:
+                answer = (await self.bot.wait_for('message', timeout=10.0, check=check))
+            except asyncio.TimeoutError:
+                webhook = DiscordWebhook(url='https://discord.com/api/webhooks/847789988602183720/RVEzJMCjnMUCp8ToD0iIYC6DrwQUNVh1l0ZCZSk4Pu7Eych237rTZhzZNOvGO_GXWp7D', content='你花了太久時間回答。'); return
+                webhook.execute()              
+
+            answer = answer.content.lower()
+
+            if answer == '是':
+                await ctx.send(core.account.roulette(ctx.message.author.id))
+            elif answer == '否':
+                webhook = DiscordWebhook(url='https://discord.com/api/webhooks/847789988602183720/RVEzJMCjnMUCp8ToD0iIYC6DrwQUNVh1l0ZCZSk4Pu7Eych237rTZhzZNOvGO_GXWp7D', content='好喔= =')
+                webhook.execute()  
+            else:
+                webhook = DiscordWebhook(url='https://discord.com/api/webhooks/847789988602183720/RVEzJMCjnMUCp8ToD0iIYC6DrwQUNVh1l0ZCZSk4Pu7Eych237rTZhzZNOvGO_GXWp7D', content='請輸入“是”或“否”')
+                webhook.execute()  
+                await asyncio.sleep(0.5)
+
+    @commands.command()
+    async def dice(self, ctx, count:str=6):
+        try:
+            count = int(count)
+        except:
+            await ctx.send('數字輸入錯誤')
+        else:
+            num = random.randint(1, count)
+            await ctx.send(f'骰出的數字為`{num}`')
+
+    @commands.command(name='2048')
+    async def twenty(self, ctx):
+        """Play 2048 game"""
+        await twenty.play(ctx, self.bot)
+
+    @commands.command(name="8ball")
+    async def eight_ball(self, ctx, ques=""):
+        """Magic 8Ball"""
+        if ques=="":
+            await ctx.send("`用法：C8ball+(問題)`")
+        else:
+            choices = [
+            '可以肯定，這是。', '很明顯。', '毫無疑問。', '當然是。',
+            '正如我所看到的，是的。', '最有可能的。', '前景良好。', '是的', '跡象表明，是的。',
+            '問句太模糊，再試一次。', '稍後再問。', '最好不要告訴你。', '現在無法預測。', '不要指望它。', '我的回復是沒有。', '我的消息人士說不。', '展望不是那麼好。', '非常可疑。'
+            ]
+            await ctx.send(f":8ball: 說： ||{random.choice(choices)}||(<<請點開)")
+
+    @commands.command(name='minesweeper', aliases=['ms'])
+    async def minesweeper(self, ctx, columns = None, rows = None, bombs = None):
+        """Play Minesweeper"""
+        await minesweeper.play(ctx, columns, rows, bombs)
+
+    @commands.command(name='rps', aliases=['rockpaperscissors'])
+    async def rps(self, ctx):
+        """Play Rock, Paper, Scissors game"""
+        def check_win(p, b):
+            if p=='🌑':
+                return False if b=='📄' else True
+            if p=='📄':
+                return False if b=='✂' else True
+            # p=='✂'
+            return False if b=='🌑' else True
+
+        async with ctx.typing():
+            reactions = ['🌑', '📄', '✂']
+            game_message = await ctx.send("**剪刀、石頭、布**\n請選擇：", delete_after=15.0)
+            for reaction in reactions:
+                await game_message.add_reaction(reaction)
+            bot_emoji = random.choice(reactions)
+
+        def check(reaction, user):
+            return user != self.bot.user and user == ctx.author and (str(reaction.emoji) == '🌑' or '📄' or '✂')
+        try:
+            reaction, _ = await self.bot.wait_for('reaction_add', timeout=10.0, check=check)
+        except asyncio.TimeoutError:
+            await ctx.send("時間到！:stopwatch:")
+        else:
+            await ctx.send(f"**:man_in_tuxedo_tone1:\t{reaction.emoji}\n:robot:\t{bot_emoji}**")
+            # if conds
+            if str(reaction.emoji) == bot_emoji:
+                await ctx.send("**平手！:ribbon:**")
+            elif check_win(str(reaction.emoji), bot_emoji):
+                await ctx.send("**你贏了 :sparkles:**")
+            else:
+                await ctx.send("**我贏了 :robot:**")
+
+    @commands.command(name='tictactoe', aliases=['ttt'])
+    async def ttt(self, ctx):
+        """Play Tic-Tac-Toe"""
+        await tictactoe.play_game(self.bot, ctx, chance_for_error=0.2) # Win Plausible
+
+    @commands.command(name='wumpus')
+    async def _wumpus(self, ctx):
+        """Play Wumpus game"""
+        await wumpus.play(self.bot, ctx)
+
+def setup(bot):
+    DiscordComponents(bot)
+    bot.add_cog(Game(bot))
