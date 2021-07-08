@@ -35,7 +35,7 @@ class Task(Cog_Extension):
       cluster = MongoClient(auth_url)
       db = cluster["Economy"]
       execute3 = {"$set": {"銀行餘額": {"$subtract":["$存款額度", "$銀行餘額"]}}}
-      db.Bank.update_many({"銀行餘額":{"$gt" : "存款額度"}}, [execute3])
+      db.Bank.update_many({"銀行餘額":{"$gt" : "$存款額度"}}, [execute3])
 
   @commands.command()
   @commands.is_owner()
