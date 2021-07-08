@@ -21,7 +21,7 @@ class Task(Cog_Extension):
         execute2 = {"$set": {"現金": {"$add": ["$現金", "$真實的薪資"]}}}
         db.Bank.update_many({}, [execute2])
         execute3 = {"$set": {"銀行餘額": {"$subtract":["$存款額度", "$銀行餘額"]}}}
-        db.Bank.update_many({"銀行餘額":{"$gt" : "存款餘額"}}, [execute3])
+        db.Bank.update_many({"銀行餘額":{"$gt" : "存款額度"}}, [execute3])
         db.Bank.update_one({"_id": "國庫"}, {"$inc": {"當周所得": 1100132}})
 
         print("已進行例行性的給予薪資")
@@ -35,7 +35,7 @@ class Task(Cog_Extension):
       cluster = MongoClient(auth_url)
       db = cluster["Economy"]
       execute3 = {"$set": {"銀行餘額": {"$subtract":["$存款額度", "$銀行餘額"]}}}
-      db.Bank.update_many({"銀行餘額":{"$gt" : "存款餘額"}}, [execute3])
+      db.Bank.update_many({"銀行餘額":{"$gt" : "存款額度"}}, [execute3])
 
   @commands.command()
   @commands.is_owner()
