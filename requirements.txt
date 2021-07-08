@@ -1,7 +1,7 @@
 discord~=1.0.1
 discord-components~=0.5.3
 discord-webhook~=0.13.0
-PyNaCl~=3.0.1
+PyNaCl
 async-timeout~=3.0.1
 config~=0.5.0
 pymongo~=3.11.3
