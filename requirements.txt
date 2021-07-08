@@ -11,6 +11,5 @@ vacefron.py
 psutil~=5.8.0
 python-dotenv~=0.17.0
 flask~=2.0.1
-python~=3.8
 timeago ~=1.0.15
 requests ~=2.25.1
