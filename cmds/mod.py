@@ -1,17 +1,18 @@
 from discord.ext import commands
-from core.classes import Cog_Extension, Global_Func
+from core.classes import Cog_Extension
 import json
 from config import *
 with open('bot_info.json', 'r', encoding='utf8') as jfile:
    jdata = json.load(jfile)
 
 class Mod(Cog_Extension):
-    @commands.command()
+    @commands.cooldown(1, 10, commands.BucketType.user)
+    @commands.command(aliases=['WHO', 'Who'])
     async def who(self, ctx):
       '''說出你是誰'''
       await ctx.send("你是**{}**！".format(ctx.message.author))
-
-    @commands.command(aliases=['msg'])
+    @commands.cooldown(1, 10, commands.BucketType.user)
+    @commands.command(aliases=['msg','MSG'])
     async def messages(self, ctx):
         tmp = await ctx.send('正在計算訊息...')
         counter = 0

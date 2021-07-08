@@ -1,6 +1,6 @@
 import discord
 from discord.ext import commands
-from core.classes import Cog_Extension
+from core.classes import Cog_Extension, Global_Func
 import json, asyncio, os
 from config import *
 
@@ -26,21 +26,21 @@ class Owner(Cog_Extension):
             await ctx.send(content=Global_Func.code(lang='fix', msg=f'已清理 {num} 則訊息.\nReason: {reason}'), delete_after=5.0)
             
   @commands.command()
-  @commands.is_owner()
+  @commands.has_permissions(administrator=True)
   async def load(self, ctx, extension):
     '''裝載 Cog'''
     self.bot.load_extension(f'cmds.{extension}')
     await ctx.send(f'Loaded {extension} done.')
 
   @commands.command()
-  @commands.is_owner()
+  @commands.has_permissions(administrator=True)
   async def unload(self, ctx, extension):
     '''卸載 Cog'''
     self.bot.unload_extension(f'cmds.{extension}')
     await ctx.send(f'Un - Loaded {extension} done.')
 
   @commands.command()
-  @commands.is_owner()
+  @commands.has_permissions(administrator=True)
   async def reload(self, ctx, extension):
     '''重新裝載 Cog'''
     if extension == '*':
@@ -53,7 +53,7 @@ class Owner(Cog_Extension):
       await ctx.send(f'Re - Loaded {extension} done.')
 
   @commands.command()
-  @commands.is_owner()
+  @commands.has_permissions(administrator=True)
   async def shutdown(self, ctx):
     await ctx.send("Shutting down...")
     await asyncio.sleep(1)

@@ -7,7 +7,7 @@ from core.classes import Cog_Extension
 from config import *
 class NSFW(Cog_Extension):
 
-    @commands.cooldown(1, 5, commands.BucketType.user)
+    @commands.cooldown(1, 10, commands.BucketType.user)
     @commands.command()
     async def hentai(self, ctx):
         if ctx.channel.id == 768722875972452352:
@@ -28,7 +28,7 @@ class NSFW(Cog_Extension):
         else:
             await ctx.message.reply("這個指令只能用在NSFW頻道。")
 
-    @commands.cooldown(1, 5, commands.BucketType.user)
+    @commands.cooldown(1, 10, commands.BucketType.user)
     @commands.command()
     async def thighs(self, ctx):
         if ctx.channel.id == 768722875972452352:
@@ -49,7 +49,7 @@ class NSFW(Cog_Extension):
         else:
             await ctx.message.reply("這個指令只能用在NSFW頻道。")
 
-    @commands.cooldown(1, 5, commands.BucketType.user)
+    @commands.cooldown(1, 10, commands.BucketType.user)
     @commands.command()
     async def nekogif(self, ctx):
         if ctx.channel.id == 768722875972452352:

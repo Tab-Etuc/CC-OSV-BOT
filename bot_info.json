@@ -1,8 +1,6 @@
 {
-    "TOKEN":"ODQwMTg2ODEzOTQ2OTIxMDMw.YJUi8g.sJFZkwbNd6YA0Ex2OD0BS3dFAJs",
-    "TOKEN2":"ODQ5MjUyNDY5NTM5ODY0NjE2.YLYd_w.99je1t71QKMZDuz2iZeNeb02giw",
-    "Prefix": ["C"],
+    "Prefix": ["C","c"],
     "Owner_id": [806346991730819121],
-    "url_pic":["https://i.pximg.net/img-original/img/2020/11/04/00/01/50/85446804_p0.png",
-                "https://i.pximg.net/img-original/img/2020/10/22/00/00/12/85157890_p0.png"]               
+    "好喔_pic":["https://cdn.discordapp.com/attachments/834074590720294912/854959330671591435/unknown.png"],
+    "WEBHOOK_URL":["https://discord.com/api/webhooks/859633422498398288/5JVnexiCnP3BIk-kLPuAk4xDqadplNzgv-85zyS25poVDjhFjPwXz1CX0SDkbUlkcSwb"]
 }

@@ -2,16 +2,16 @@ from discord.ext import commands
 from core.classes import Cog_Extension, Gloable_Data
 from core.errors import Errors
 import json
-import googletrans
 import discord
 import re
 
-
+'''
+import googletrans
 client = discord.Client()
 tr = googletrans.Translator()
 DEFAULT_LANGUAGE = "zh-tw"
 LOGGING = False	
-
+'''
 with open('bot_info.json', 'r', encoding='utf8') as jfile:
    jdata = json.load(jfile)
 
@@ -123,8 +123,8 @@ class Event(Cog_Extension):
   
   @commands.Cog.listener()
   async def on_raw_reaction_add(self, data):
-      if data.message_id == 837974875875311628:
-          if str(data.emoji) == '<:emoji_13:837971561725952020>': 
+      if data.message_id == 858140566268411924:
+          if str(data.emoji) == '<:E13:837971561725952020>': 
               guild = self.bot.get_guild(data.guild_id)
               role = guild.get_role(837975201915994153)
               await data.member.add_roles(role)
@@ -135,8 +135,8 @@ class Event(Cog_Extension):
               role = guild.get_role(834430171171258417)
               await data.member.add_roles(role)
               await data.member.send(f"你已取得普通公民身分，正式進入我國國境。")
-      elif data.message_id == 837968124204679170:
-          if str(data.emoji) == '<:emoji_7:835137032300003348>': 
+      elif data.message_id == 858138565967085649:
+          if str(data.emoji) == '<a:gif1:840492057009324073>': 
               guild = self.bot.get_guild(data.guild_id)
               role = guild.get_role(837968327014875177)
               await data.member.add_roles(role)
@@ -199,18 +199,29 @@ class Event(Cog_Extension):
             guild = self.bot.get_guild(data.guild_id)
             role = guild.get_role(846317429466595348)
             await data.member.add_roles(role)
-            await data.member.send(f"你已成功變更名稱顏色。")       
-      elif data.message_id == 853487725276954625:  
+            await data.member.send(f"你已成功變更名稱顏色。")    
+      elif data.message_id == 858139579172651028:  
         if str(data.emoji) == '<a:756908393699999895:840493545034481684>':
             guild = self.bot.get_guild(data.guild_id)
             role = guild.get_role(853484122924515350)
             await data.member.add_roles(role)
-            await data.member.send(f"你已成功入教。願蘿神保佑你。")  
-        
+            await data.member.send(f"你已成功入教。願蘿神保佑你。")
+        elif str(data.emoji) == '<:E35:845572996089249792>':
+            guild = self.bot.get_guild(data.guild_id)
+            role = guild.get_role(858139056843915264)
+            await data.member.add_roles(role)
+            await data.member.send(f"你已入哲♂學會。")   
+      elif data.message_id == 858160262606880818:  
+        if str(data.emoji) == '<a:V_:858154997640331274>':
+            guild = self.bot.get_guild(data.guild_id)
+            role = guild.get_role(834430171171258417)
+            await data.member.add_roles(role)
+            await data.member.send(f"你已成功進入我國國境")
+
   @commands.Cog.listener()                
   async def on_raw_reaction_remove(self, data):
-      if data.message_id == 837974875875311628:
-          if str(data.emoji) == '<:emoji_13:837971561725952020>':
+      if data.message_id == 858140566268411924:
+          if str(data.emoji) == '<:E13:837971561725952020>':
                 guild = self.bot.get_guild(data.guild_id)
                 user = await guild.fetch_member(data.user_id)
                 role = guild.get_role(837975201915994153)
@@ -223,8 +234,8 @@ class Event(Cog_Extension):
                 role = guild.get_role(834430171171258417)
                 await user.remove_roles(role)
                 await user.send(f"你已喪失普通公民身分，被驅逐我國國境。")
-      elif data.message_id == 837968124204679170:
-            if str(data.emoji) == '<:emoji_7:835137032300003348>':
+      elif data.message_id == 858138565967085649:
+            if str(data.emoji) == '<:gif1:840492057009324073>':
                 guild = self.bot.get_guild(data.guild_id)
                 user = await guild.fetch_member(data.user_id)
                 role = guild.get_role(837968327014875177)
@@ -300,13 +311,19 @@ class Event(Cog_Extension):
                     role = guild.get_role(846317429466595348)
                     await user.remove_roles(role)
                     await user.send(f"你已成功移除名稱顏色。")  
-      elif data.message_id == 853487725276954625:  
+      elif data.message_id == 858139579172651028:  
         if str(data.emoji) == '<:756908393699999895:840493545034481684>':
             guild = self.bot.get_guild(data.guild_id)
             user = await guild.fetch_member(data.user_id)
             role = guild.get_role(853484122924515350)
             await user.remove_roles(role)
             await user.send(f"你已退教。")    
+        elif str(data.emoji) == '<:E35:845572996089249792>':
+            guild = self.bot.get_guild(data.guild_id)
+            user = await guild.fetch_member(data.user_id)
+            role = guild.get_role(858139056843915264)
+            await user.remove_roles(role)
+            await user.send(f"你已退會。")                
 
 def setup(bot):
   bot.add_cog(Event(bot))

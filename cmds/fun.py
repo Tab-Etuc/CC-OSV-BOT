@@ -3,14 +3,17 @@ import discord
 from discord.ext import commands
 from PIL import Image, ImageFont, ImageDraw
 from io import BytesIO
-import random
+import random,json
 from config import *
 import aiohttp
 import requests
 
+with open('bot_info.json','r', encoding='utf8') as jfile:
+    jdata = json.load(jfile)
+
 class Fun(Cog_Extension):
-  @commands.cooldown(1, 5, commands.BucketType.user)
-  @commands.command()
+  @commands.cooldown(1, 10, commands.BucketType.user)
+  @commands.command(aliases=['WHENDIE', 'BET', 'Whendie'])
   async def whendie(self, ctx, *, user: discord.Member = None):
         if user == None:
             user = ctx.author
@@ -55,40 +58,45 @@ class Fun(Cog_Extension):
         embed.set_footer(text=funny_text)
 
         await msg.edit(embed=embed)
-        
-  @commands.command()
-  async def owo(self, ctx, *, msg):
+  @commands.cooldown(1, 10, commands.BucketType.user)
+  @commands.command(aliases=['owo'.casefold()])
+  async def _owo(self, ctx, *, msg):
+        await ctx.message.delete()
+        if msg == "好喔":
+          好喔 = random.choice(jdata['好喔_pic'])
+          await ctx.send(好喔)       
+          
+        else:
+            vowels = ['a', 'e', 'i', 'o', 'u', 'A', 'E', 'I', 'O', 'U']
 
-        vowels = ['a', 'e', 'i', 'o', 'u', 'A', 'E', 'I', 'O', 'U']
+            def last_replace(s, old, new):
+                li = s.rsplit(old, 1)
+                return new.join(li)
 
-        def last_replace(s, old, new):
-            li = s.rsplit(old, 1)
-            return new.join(li)
+            def text_to_owo(text):
+                """ Converts your text to OwO """
+                smileys = [';;w;;', '^w^', '>w<', 'UwU', '(・`ω\´・)', '(´・ω・\`)']
 
-        def text_to_owo(text):
-            """ Converts your text to OwO """
-            smileys = [';;w;;', '^w^', '>w<', 'UwU', '(・`ω\´・)', '(´・ω・\`)']
+                text = text.replace('L', 'W').replace('l', 'w')
+                text = text.replace('R', 'W').replace('r', 'w')
 
-            text = text.replace('L', 'W').replace('l', 'w')
-            text = text.replace('R', 'W').replace('r', 'w')
+                text = last_replace(text, '!', '! {}'.format(random.choice(smileys)))
+                text = last_replace(text, '?', '? owo')
+                text = last_replace(text, '.', '. {}'.format(random.choice(smileys)))
 
-            text = last_replace(text, '!', '! {}'.format(random.choice(smileys)))
-            text = last_replace(text, '?', '? owo')
-            text = last_replace(text, '.', '. {}'.format(random.choice(smileys)))
+                for v in vowels:
+                    if 'n{}'.format(v) in text:
+                        text = text.replace('n{}'.format(v), 'ny{}'.format(v))
+                    if 'N{}'.format(v) in text:
+                        text = text.replace('N{}'.format(v), 'N{}{}'.format('Y' if v.isupper() else 'y', v))
 
-            for v in vowels:
-                if 'n{}'.format(v) in text:
-                    text = text.replace('n{}'.format(v), 'ny{}'.format(v))
-                if 'N{}'.format(v) in text:
-                    text = text.replace('N{}'.format(v), 'N{}{}'.format('Y' if v.isupper() else 'y', v))
+                return text
 
-            return text
-
-        await ctx.send(text_to_owo(msg))             
+            await ctx.send(text_to_owo(msg))             
 
 
-  @commands.cooldown(1, 5, commands.BucketType.user)
-  @commands.command(help="展示你有多可愛，我知道你很可愛！")
+  @commands.cooldown(1, 10, commands.BucketType.user)
+  @commands.command(aliases=['HowCute', 'HOWCUTE', 'Howcute'])
   async def howcute(self, ctx, user: discord.Member = None):
         if user == None:
             user = ctx.author
@@ -123,8 +131,8 @@ class Fun(Cog_Extension):
         await msg1.edit(embed=embed)
 
 
-
-  @commands.command()
+  @commands.cooldown(1, 10, commands.BucketType.user)
+  @commands.command(aliases=['BURN', 'Burn'])
   async def burn(self, ctx, user: discord.Member = None):
       if user == None:
           user = ctx.author
@@ -142,8 +150,8 @@ class Fun(Cog_Extension):
 
       await ctx.send(file = discord.File("epic_burn.jpg"))
 
-
-  @commands.command()
+  @commands.cooldown(1, 10, commands.BucketType.user)
+  @commands.command(aliases=['Trash', 'TRASH'])
   async def trash(self, ctx, user: discord.Member = None):
       if user == None:
           user = ctx.author
@@ -160,8 +168,8 @@ class Fun(Cog_Extension):
       trash.save("epic_trash.jpg")
 
       await ctx.send(file = discord.File("epic_trash.jpg"))
-  @commands.cooldown(1, 5, commands.BucketType.user)
-  @commands.command()
+  @commands.cooldown(1, 10, commands.BucketType.user)
+  @commands.command(aliases=['MEME', 'Meme'])
   async def meme(self, ctx):
         embed=discord.Embed(
             title = "哈哈!",
@@ -174,8 +182,8 @@ class Fun(Cog_Extension):
                 embed.set_image(url=res['data']['children'][random.randint(0, 25)]['data']['url'])
                 await ctx.send(embed=embed)
 
-  @commands.cooldown(1, 5, commands.BucketType.user)
-  @commands.command()
+  @commands.cooldown(1, 10, commands.BucketType.user)
+  @commands.command(aliases=['ANIME', 'Anime'])
   async def anime(self, ctx):
         response = requests.get("https://shiro.gg/api/images/neko")
 
@@ -189,8 +197,8 @@ class Fun(Cog_Extension):
 
         await ctx.send(embed=embed)
 
-  @commands.cooldown(1, 5, commands.BucketType.user)
-  @commands.command(aliases=['meow', 'cats'])
+  @commands.cooldown(1, 10, commands.BucketType.user)
+  @commands.command(aliases=['meow', 'cats','CAT'])
   async def cat(self, ctx):
         async with ctx.channel.typing():
             async with aiohttp.ClientSession() as cs:
@@ -203,8 +211,8 @@ class Fun(Cog_Extension):
 
                     await ctx.message.reply(embed=embed)
 
-  @commands.cooldown(1, 5, commands.BucketType.user)
-  @commands.command(aliases=['dogs'])
+  @commands.cooldown(1, 10, commands.BucketType.user)
+  @commands.command(aliases=['dogs','DOG'])
   async def dog(self, ctx):
         async with ctx.channel.typing():
             async with aiohttp.ClientSession() as cs:
@@ -216,8 +224,8 @@ class Fun(Cog_Extension):
 
                     await ctx.message.reply(embed=embed)
 
-  @commands.cooldown(1, 5, commands.BucketType.user)
-  @commands.command()
+  @commands.cooldown(1, 10, commands.BucketType.user)
+  @commands.command(aliases=['FOX', 'Fox'])
   async def fox(self, ctx):
         url = "https://randomfox.ca/floof/"
         response = requests.get(url)
@@ -227,8 +235,8 @@ class Fun(Cog_Extension):
         embed.set_image(url=fox['image'])
         await ctx.message.reply(embed=embed)
 
-  @commands.cooldown(1, 5, commands.BucketType.user)
-  @commands.command()
+  @commands.cooldown(1, 10, commands.BucketType.user)
+  @commands.command(aliases=['PANDA', 'Panda'])
   async def panda(self, ctx):
         url = 'https://some-random-api.ml/img/panda'
         response = requests.get(url)
@@ -238,8 +246,8 @@ class Fun(Cog_Extension):
         embed.set_image(url=img['link'])
         await ctx.message.reply(embed=embed)
 
-  @commands.cooldown(1, 5, commands.BucketType.user)
-  @commands.command()
+  @commands.cooldown(1, 10, commands.BucketType.user)
+  @commands.command(aliases=['REDPANDA', 'Redpanda'])
   async def redpanda(self, ctx):
         url = 'https://some-random-api.ml/img/red_panda'
         response = requests.get(url)
@@ -249,8 +257,8 @@ class Fun(Cog_Extension):
         embed.set_image(url=img['link'])
         await ctx.message.reply(embed=embed)
 
-  @commands.cooldown(1, 5, commands.BucketType.user)
-  @commands.command(aliases=['pika'])
+  @commands.cooldown(1, 10, commands.BucketType.user)
+  @commands.command(aliases=['pika','PIKA'])
   async def pikachu(self, ctx):
         url = 'https://some-random-api.ml/img/pikachu'
         response = requests.get(url)
@@ -260,13 +268,13 @@ class Fun(Cog_Extension):
         embed.set_image(url=img['link'])
         await ctx.message.reply(embed=embed)
 
-  @commands.cooldown(1, 5, commands.BucketType.user)
-  @commands.command()
+  @commands.cooldown(1, 10, commands.BucketType.user)
+  @commands.command(aliases=['COMMENT', 'Comment'])
   async def comment(self, ctx, *, msg=None):
         if msg == None:
             await ctx.message.reply(embed=discord.Embed(
-                title="Error!",
-                description=f"Incorrect Usage! Use like this: `e!comment <text>`",
+                title="錯誤!",
+                description=f"請參照此用法`Ccomment 訊息`",
                 color=RED_COLOR
             ))
             return
@@ -276,8 +284,8 @@ class Fun(Cog_Extension):
         embed.set_image(url=url)
         await ctx.message.reply(embed=embed)
 
-  @commands.cooldown(1, 5, commands.BucketType.user)
-  @commands.command()
+  @commands.cooldown(1, 10, commands.BucketType.user)
+  @commands.command(aliases=['WASTED', 'Wasted'])
   async def wasted(self, ctx, user: discord.Member = None):
         if user == None:
             user = ctx.author

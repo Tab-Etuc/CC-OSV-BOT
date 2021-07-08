@@ -8,21 +8,6 @@ def count():
     df = pd.read_csv('accounts.csv')
     return len(df.index)
 
-
-def register(name):
-    df = pd.read_csv('accounts.csv')
-
-    if (df["UserId"] == int(name)).any():
-        webhook = DiscordWebhook(url='https://discord.com/api/webhooks/847789988602183720/RVEzJMCjnMUCp8ToD0iIYC6DrwQUNVh1l0ZCZSk4Pu7Eych237rTZhzZNOvGO_GXWp7D', content='你已經開過戶了。')
-        webhook.execute()
-    else:
-        with open('accounts.csv', 'a', newline='') as fd:
-            fdw = csv.writer(fd)
-            fdw.writerow([name, 0, 0, 0, 0, 0, 0, 0])
-            webhook = DiscordWebhook(url='https://discord.com/api/webhooks/847789988602183720/RVEzJMCjnMUCp8ToD0iIYC6DrwQUNVh1l0ZCZSk4Pu7Eych237rTZhzZNOvGO_GXWp7D', content='開戶成功。')
-            webhook.execute()
-
-
 def bal(name):
     df = pd.read_csv('accounts.csv')
 

@@ -3,7 +3,7 @@ import asyncio
 import core.account
 from discord_webhook.webhook import DiscordWebhook
 from discord.ext import commands
-from games import tictactoe, wumpus, minesweeper, twenty
+from cmds.games import tictactoe, wumpus, minesweeper, twenty
 from core.classes import Cog_Extension
 from discord import Embed
 from discord_components import DiscordComponents, Button, ButtonStyle
@@ -13,7 +13,7 @@ from config import *
 
 class Game(Cog_Extension):
     @commands.command(name="老虎機", aliases=['slots', 'bet'])
-    @commands.cooldown(rate=1, per=3.0, type=commands.BucketType.user)
+    @commands.cooldown(rate=1, per=10.0, type=commands.BucketType.user)
     async def slot(self, ctx):
         """ Roll the slot machine """
         emojis = "🍎🍊🍐🍋🍉🍇🍓🍒"
@@ -29,7 +29,7 @@ class Game(Cog_Extension):
             await ctx.send(f"{slotmachine} 2 in a row, you won! 🎉")
         else:
             await ctx.send(f"{slotmachine} No match, you lost 😢")
-            
+    @commands.cooldown(1, 10, commands.BucketType.user)
     @commands.command(name='toss', aliases=['flip'])
     async def cointoss(self, ctx):
         embed = Embed(
@@ -123,11 +123,11 @@ class Game(Cog_Extension):
             self.session_message[ctx.author.id] = msg
             await self.cointoss(ctx)
 
-
-    @commands.command(name='numgame', aliases=['nungame','num'])
+    @commands.cooldown(1, 10, commands.BucketType.user)
+    @commands.command(name='numgame', aliases=['nungame','num', 'NUNGAME'])
     async def numgame(self, ctx):
       if core.account.bal(ctx.author.id) is None:
-          await ctx.send("請參照此格式 `Creg`開戶。")
+          await ctx.send("我還沒寫好，欸嘿")
           return
 
       await ctx.send('猜一個數字在壹到壹佰之間。')
@@ -151,6 +151,7 @@ class Game(Cog_Extension):
 
           if int(guess.content) == answer:
               break
+    @commands.cooldown(1, 10, commands.BucketType.user)
     @commands.command(name='roulette', aliases=['輪盤','RL'])
     async def roulette(self, ctx):
 
@@ -179,8 +180,8 @@ class Game(Cog_Extension):
                 webhook = DiscordWebhook(url='https://discord.com/api/webhooks/847789988602183720/RVEzJMCjnMUCp8ToD0iIYC6DrwQUNVh1l0ZCZSk4Pu7Eych237rTZhzZNOvGO_GXWp7D', content='請輸入“是”或“否”')
                 webhook.execute()  
                 await asyncio.sleep(0.5)
-
-    @commands.command()
+    @commands.cooldown(1, 10, commands.BucketType.user)
+    @commands.command(aliases=['DICE', 'Dice'])
     async def dice(self, ctx, count:str=6):
         try:
             count = int(count)
@@ -189,13 +190,13 @@ class Game(Cog_Extension):
         else:
             num = random.randint(1, count)
             await ctx.send(f'骰出的數字為`{num}`')
-
+    @commands.cooldown(1, 10, commands.BucketType.user)
     @commands.command(name='2048')
     async def twenty(self, ctx):
         """Play 2048 game"""
         await twenty.play(ctx, self.bot)
-
-    @commands.command(name="8ball")
+    @commands.cooldown(1, 10, commands.BucketType.user)
+    @commands.command(aliases=["8ball","8BALL"])
     async def eight_ball(self, ctx, ques=""):
         """Magic 8Ball"""
         if ques=="":
@@ -207,12 +208,12 @@ class Game(Cog_Extension):
             '問句太模糊，再試一次。', '稍後再問。', '最好不要告訴你。', '現在無法預測。', '不要指望它。', '我的回復是沒有。', '我的消息人士說不。', '展望不是那麼好。', '非常可疑。'
             ]
             await ctx.send(f":8ball: 說： ||{random.choice(choices)}||(<<請點開)")
-
+    @commands.cooldown(1, 10, commands.BucketType.user)
     @commands.command(name='minesweeper', aliases=['ms'])
     async def minesweeper(self, ctx, columns = None, rows = None, bombs = None):
         """Play Minesweeper"""
         await minesweeper.play(ctx, columns, rows, bombs)
-
+    @commands.cooldown(1, 10, commands.BucketType.user)
     @commands.command(name='rps', aliases=['rockpaperscissors'])
     async def rps(self, ctx):
         """Play Rock, Paper, Scissors game"""
@@ -246,13 +247,13 @@ class Game(Cog_Extension):
                 await ctx.send("**你贏了 :sparkles:**")
             else:
                 await ctx.send("**我贏了 :robot:**")
-
+    @commands.cooldown(1, 10, commands.BucketType.user)
     @commands.command(name='tictactoe', aliases=['ttt'])
     async def ttt(self, ctx):
         """Play Tic-Tac-Toe"""
         await tictactoe.play_game(self.bot, ctx, chance_for_error=0.2) # Win Plausible
-
-    @commands.command(name='wumpus')
+    @commands.cooldown(1, 10, commands.BucketType.user)
+    @commands.command(name='wumpus', aliases=['WUMPUS', 'Wumpus'])
     async def _wumpus(self, ctx):
         """Play Wumpus game"""
         await wumpus.play(self.bot, ctx)

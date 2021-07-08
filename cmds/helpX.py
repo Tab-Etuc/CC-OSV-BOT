@@ -2,9 +2,7 @@ import discord
 from discord.ext import commands 
 from config import *
 from disputils import BotEmbedPaginator, BotConfirmation, BotMultipleChoice
-
-# you will need config.py from the main Bot folder or else this wont work ><
-# vote epicbot OwO | epic-bot.com/vote 😊
+from help import *
 
 category_list = ""
 total_cmds = 0
@@ -17,7 +15,7 @@ class HelpX(commands.Cog):
     def __init__(self, client):
         self.client = client
 
-    @commands.cooldown(1, 5, commands.BucketType.user)
+    @commands.cooldown(1, 10, commands.BucketType.user)
     @commands.command()
     async def help(self, ctx, *, hmm_category = None):
         if hmm_category == None:
@@ -92,6 +90,40 @@ class HelpX(commands.Cog):
 
             await ctx.message.reply(embed=embed)
             return
+        if hmm_category.lower() in all_cmds:
+            if hmm_category.lower() in nsfw and not ctx.channel.is_nsfw():
+                embed=discord.Embed(
+                        title = "Go away horny!",
+                        description = "This can only be used in a NSFW channel.",
+                        color = RED_COLOR
+                    )
+                await ctx.message.reply(embed=embed)
+                return
+
+            embed=discord.Embed(
+                title=f"{hmm_category.lower().title()}",
+                description=f"""
+**用法：** `C{all_cmds[hmm_category.lower()][2]}`
+別名：{all_cmds[hmm_category.lower()][1]}
+
+- {all_cmds[hmm_category.lower()][0]}
+""",
+                color=MAIN_COLOR
+            )
+
+            await ctx.message.reply(embed=embed)
+            return
+
+        else:
+
+            embed=discord.Embed(
+                title = "Sowwy!",
+                description = f"I wasn't able to find the command `{hmm_category}`",
+                color = RED_COLOR
+            )
+
+            await ctx.message.reply(embed=embed)
+
 
 
 def setup(client):

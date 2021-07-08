@@ -1,115 +1,95 @@
 import discord
 from discord.ext import commands
+import os, json, random
+from pymongo import MongoClient
 from core.classes import Cog_Extension
-import core.account
+import core.economy
 from discord_webhook.webhook import DiscordWebhook, DiscordEmbed
-from discord_components import DiscordComponents, Button, ButtonStyle
-from discord import Embed
-import pandas as pd
-import json
+import time, datetime
 from config import *
 
+auth_url = os.getenv("MONGODB_URI")
 
-async def open_account(user):
+with open('bot_info.json','r', encoding='utf8') as jfile:
+    jdata = json.load(jfile)
+    WEBHOOK_URL = jdata["WEBHOOK_URL"]
 
-      users = await get_bank_data()
+class Mongo(Cog_Extension):  
 
-      if str(user.id) in users:
-          return False
-      else:
-          users[str(user.id)] = {}
+    @commands.cooldown(1, 10, commands.BucketType.user)
+    @commands.command()
+    @commands.has_permissions(administrator=True)
+    async def count(self, ctx):
+      cluster = MongoClient(auth_url)
+      db = cluster["Economy"]
 
+      cursor = db["Bank"]
+      filter = {"真人":"True"}
+      user = cursor.count_documents(filter)
+      webhook = DiscordWebhook(url=WEBHOOK_URL, content=f'已經有{user}位國民已開戶。')
+      webhook.execute()
 
-      with open('mainbank.json','w') as f:
-          json.dump(users,f)
+    @commands.cooldown(1, 10, commands.BucketType.user)
+    @commands.command()
+    @commands.has_permissions(administrator=True)
+    async def top(self, ctx):
+      data = []
+      index = 1
+      cluster = MongoClient(auth_url)
+      db = cluster["Economy"]
 
-      return True
+      cursor = db["Bank"]
+      mydoc = cursor.find().sort("銀行餘額",-1)
+      for member in mydoc:
+        if index > 8:
+            break
+        
 
-async def get_bank_data():
-      with open('mainbank.json','r') as f:
-          users = json.load(f)
-      
-      return users
+        member_name = self.bot.get_user(member["_id"])
+        member_wa_amt = member["現金"]
+        member_ba_amt = member['銀行餘額']
+        member_amt = 0
+        member_amt += int(member_wa_amt + member_ba_amt)
 
-async def buy_this(user,item_name,amount,new):
-  item_name = item_name.lower()
-  name_ = None
-  for item in mainshop:
-      name = item["name"].lower()
-      if name == item_name:
-          name_ = name
-          price = item["price"]
-          break
-            
-  if name_ == None:
-      return [False,1]
+        if index == 1:
+            msg1 = f"**🥇 `{member_name}` -- {member_amt}**"
+            data.append(msg1)
 
-  bal = core.account.bal(user)
-  cost = price*amount
-  users = await get_bank_data()
+        if index == 2:
+            msg2 = f"**🥈 `{member_name}` -- {member_amt}**"
+            data.append(msg2)
 
-  if bal < cost:
-      return [False,2]
-            
-  try:
-    index = 0
-    t = None
-    for thing in users[str(new.id)]["bag"]:
-        n = thing["item"]
-        if n == item_name:
-                old_amt = thing["amount"]
-                new_amt = old_amt + amount
-                users[str(new.id)]["bag"][index]["amount"] = new_amt
-                t = 1
-                break
-        index+=1 
-    if t == None:
-            obj = {"item":item_name , "amount" : amount}
-            users[str(new.id)]["bag"].append(obj)
-  except:
-        obj = {"item":item_name , "amount" : amount}
-        users[str(new.id)]["bag"] = [obj]        
-            
-  with open("mainbank.json","w") as f:
-      json.dump(users,f)
+        if index == 3:
+            msg3 = f"**🥉 `{member_name}` -- {member_amt}**\n"
+            data.append(msg3)
 
-  df = pd.read_csv('accounts.csv')
-  df.loc[df["UserId"] == int(user), "Balance"] -= cost
-  df.to_csv('accounts.csv', index=False)
+        if index >= 4:
+            members = f"**{index} `{member_name}` -- {member_amt}**"
+            data.append(members)
+        index += 1
 
-  
-  return [True,"Worked"]
+      msg = "\n".join(data)
 
-mainshop = [{"name":"Card","price":3000,"description":"c"},
-            {"name":"LuckyClover","price":77777,"description":"Work"},
-            {"name":"NTD","price":100000000000000000000,"description":"Gaming"},
-            {"name":"watch","price":200000,"description":"Sports Car"},
-            {"name":"NameColor","price":2000000,"description":"Sports Car"},
-            {"name":"BGTutorials","price":99879}
-            
-            
-            ]
+      em = discord.Embed(
+          title=f"頂尖 {index-1}位 最富有的國民 - 排行榜 ",
+          description=f"它基於全國國民的淨資產（現金+銀行餘額）||其實還沒寫好|| \n\n{msg}",
+          color=discord.Color(0x00ff00),
+          timestamp=datetime.datetime.utcnow()
+      )
+      em.set_footer(text=f"全國 - {ctx.guild.name}")
+      await ctx.send(embed=em)
 
-
-class Economy(Cog_Extension):
-  @commands.command()
-  async def shop(self, ctx):
-    embed = discord.Embed(colour=discord.Colour(0xfdf74e), description="**如欲購買物品請使用`Cbuy 物品 [數量]`**\n\n**CC-OSV SHOP - Page 1/2**\n<:__:852028673363279893> `card` - 普卡，可以減免3%的稅。日後可升級 。 | **3,000** <:coin:852035374636728320>\n<:__:852032874940858380> `luckyclover` - 為賭博性質的遊戲提升些許成功機率。 | **77,777** <:coin:852035374636728320>\n<:NTD:852048045695827988> `NTD` - 簡明幣🔀新台幣20$ | **1e20** <:coin:852035374636728320>\n⌚ `watch` - 可見顯示現在時間之頻道。 | **200,000** <:coin:852035374636728320>\n<:key:852056890707279892> `namecolor` - 獲取進入<#846673897079308288>的頻道鑰匙。 | **2,000,000** <:coin:852035374636728320>\n<:key:852056890707279892> `BGTutorials` - 購買Discord背景更換教學。  | **99,879** <:coin:852035374636728320> ")
-
-    await ctx.send(embed = embed)
-
-  @commands.command()
-  async def bag(self, ctx):
-      await open_account(ctx.author)
+    @commands.cooldown(1, 10, commands.BucketType.user)
+    @commands.command()
+    async def bag(self, ctx):
+      await core.economy.open_account(ctx.author)
       user = ctx.author
-      users = await get_bank_data()
+      users = await core.economy.get_bag_data()
 
       try:
           bag = users[str(user.id)]["bag"]
       except:
           bag = []
-
-
       em = discord.Embed(title = f"{ctx.author}的背包")
       for item in bag:
           name = item["item"]
@@ -119,11 +99,12 @@ class Economy(Cog_Extension):
 
       await ctx.send(embed = em)
 
-  @commands.command()
-  async def buy(self, ctx, item, amount = 1):
-        await open_account(ctx.author)
+    @commands.cooldown(1, 10, commands.BucketType.user)
+    @commands.command()
+    async def buy(self, ctx, item, amount = 1):
+        await core.economy.open_account(ctx.author)
 
-        res = await buy_this(ctx.message.author.id,item,amount,ctx.author)
+        res = await core.economy.buy_this(ctx.message.author,item,amount,ctx.author)
         if not res[0]:
           if res[1]==1:
               await ctx.send("並沒有這項物品。")
@@ -131,14 +112,13 @@ class Economy(Cog_Extension):
           if res[1]==2:
               await ctx.send(f"你沒有足夠的錢購買{amount}個`{item}`。")
               return
+          if res[1]==3:
+              await ctx.send(f"你已經購買過`{item}`了。")
+              return
 
         member = ctx.message.author
         await ctx.send(f"你已買了{amount}個`{item}`。")
-        if "card" in str(item): 
-          guild=self.bot.get_guild(833942312018771989)
-          role =guild.get_role(852083795015499776)
-          await member.add_roles(role)
-        elif "luckyclover" in str(item): 
+        if "luckyclover" in str(item): 
           guild=self.bot.get_guild(833942312018771989)
           role =guild.get_role(852083684685119488)
           await member.add_roles(role)
@@ -154,156 +134,525 @@ class Economy(Cog_Extension):
         elif "BG" in str(item): 
           guild=self.bot.get_guild(833942312018771989)
           role =guild.get_role(854580418632351804)
-          await member.add_roles(role)        
+          await member.add_roles(role)
 
-
-  @commands.command()
-  async def menu(self, ctx):
-    await ctx.message.delete()
-    embed = Embed(
-            color=0xF5F5F5,
-            title="簡明銀行介面",
-            description="點擊下方按鈕進行操作",
-        )
-
-    menu_components = [
-            [
-                Button(style=ButtonStyle.red, label="開戶",  disabled=True),
-                Button(style=ButtonStyle.green, label="領薪水(兩小時一次)"),
-                Button(style=ButtonStyle.green, label="列出本國前五的富豪")
-            ],
-            [
-                Button(style=ButtonStyle.green, label="列出本國薪資表"),
-                Button(style=ButtonStyle.green, label="列出已於本銀行開戶數"),
-                Button(style=ButtonStyle.green, label="顯示你的餘額"),
-            ]
-        ]
-    end_components = [
-          [
-                    Button(style=ButtonStyle.green, label="再次操作？"),
-          ]
-        ]
-    
-    if ctx.author.id in self.session_message:
-            msg = self.session_message[ctx.author.id]
-            await msg.edit(embed=embed, components=menu_components)
-    else:
-            msg = await ctx.send(embed=embed, components=menu_components)
-            self.session_message[ctx.author.id] = msg
-
-    def check(res):
-            return res.user.id == ctx.author.id and res.channel.id == ctx.channel.id
-
-    try:
-            res = await self.bot.wait_for("button_click", check=check, timeout=20)
-    except TimeoutError:
-            await msg.edit(
-                embed=Embed(color=0xED564E, title="時間到!", description="沒有人回應。 ☹️"),
-                components=[
-                    Button(style=ButtonStyle.red, label="已超時!", disabled=True)
-                ],
-            );return
-
-    await res.respond(
-            type=7,
-            embed=Embed(
-                color=0xF5F5F5,
-                title="已成功執行動作。"
-            ),components=end_components,
-        )
-
-    if res.component.label == "列出本國前五的富豪":
-          await self.top(ctx)
-    elif res.component.label == "領薪水(兩小時一次)":
-          await core.account.payday(ctx.message.author.id)
-    elif res.component.label == "列出已於本銀行開戶數":
-          await self.count(ctx)
-    elif res.component.label == "列出本國薪資表":
-          await self.salary(ctx)
-    elif res.component.label == "顯示你的餘額":
-          await self.MenuBal(ctx)
-
-    await msg.edit(
-            embed=embed,
-            components=end_components,
-        )
-
-    try:
-            res = await self.bot.wait_for("button_click", check=check, timeout=20)
-    except TimeoutError:
-            await msg.delete()
-            del self.session_message[ctx.author.id]
+    @commands.cooldown(1, 10, commands.BucketType.user)
+    @commands.command(aliases=['rb2'])
+    async def rob(self, ctx,member : discord.Member): 
+      if member == ctx.author:
+        webhook = DiscordWebhook(url=WEBHOOK_URL, content='自己搶自己並不會憑空冒出多的錢。')
+        webhook.execute(); return
+      embed_ = await core.economy.loading()
+      user = ctx.author
+      webhook = DiscordWebhook(url=WEBHOOK_URL)  
+      await core.economy.open_bank(user)
+      await core.economy.open_bank(member)
+      bal = await core.economy.get_bank_data(member)
+      data = await core.economy.get_bank_data(user)
+      timer = data[8]
+      now_time = int(time.time())
+      timeleft = int(now_time-timer)
+      timeleft = 86400 - timeleft
+      if timeleft > 0:
+            typeT = '秒'
+            if timeleft > 60 and timeleft < 3600:
+                timeleft = timeleft // 60
+                typeT = '分鐘'
+            elif timeleft >=3600:
+              timeleft = timeleft // 3600
+              typeT= '小時'
+            webhook = DiscordWebhook(url=WEBHOOK_URL, content='你仍需等待{}{}!'.format(timeleft, typeT))
+            webhook.execute()
+            webhook.delete(embed_)
             return
 
-    await res.respond(type=6)
-    if res.component.label == "再次操作？":
-            self.session_message[ctx.author.id] = msg
-            await self.menu(ctx)
+      if bal[0]<100:    
 
- 
-  @commands.command(name='top')
-  async def top(self, ctx):
-    leadboard = core.account.top()
-    name1 = await self.bot.fetch_user(leadboard[0][0])
-    name2 = await self.bot.fetch_user(leadboard[1][0])
-    name3 = await self.bot.fetch_user(leadboard[2][0])
-    name4 = await self.bot.fetch_user(leadboard[3][0])
-    name5 = await self.bot.fetch_user(leadboard[4][0])
+          embed3=DiscordEmbed(title="搶他也沒用:(", description="他剩沒有多少現金了。", color=ORANGE_COLOR)
+          
+          webhook.add_embed(embed3)
+          webhook.delete(embed_)
+          webhook.execute(embed3)
+          return
 
-    fmt = '1.`{0.display_name}`: {1}2.`{2.display_name}`: {3}3.`{4.display_name}`: {5}4.`{6.display_name}`: {7}5.`{8.display_name}`: {9}'
-    board = fmt.format(name1, leadboard[0][1] + '\n', name2, leadboard[1][1] + '\n', name3, leadboard[2][1] + '\n', name4, leadboard[3][1] + '\n', name5, leadboard[4][1])
-    
-    webhook = DiscordWebhook(url='https://discord.com/api/webhooks/847789988602183720/RVEzJMCjnMUCp8ToD0iIYC6DrwQUNVh1l0ZCZSk4Pu7Eych237rTZhzZNOvGO_GXWp7D')
+      earning = random.randrange(0,bal[0])
 
-    embed = DiscordEmbed(title="排行榜", color='0x724ded', description=board)
-    webhook.add_embed(embed)
-    webhook.execute()
-  
+      await core.economy.update_bank(ctx.author,earning)
+      await core.economy.update_bank(member,-1*earning)
+      await core.economy.update_set_bank(ctx.author,now_time,"Rob")
+      webhook = DiscordWebhook(url=WEBHOOK_URL, content=f'{ctx.author}已搶了{member} **{earning}** 元！')
+      webhook.delete(embed_)
+      webhook.execute()
+    @commands.cooldown(1, 10, commands.BucketType.user)
+    @commands.command()
+    @commands.guild_only()
+    async def 國庫(self, ctx):
+      webhook = DiscordWebhook(url=WEBHOOK_URL)  
+      embed_ = await core.economy.loading()
 
-  @commands.command(name='register', aliases=['reg','開戶'])
-  async def register(self, ctx):       
-        await ctx.send(core.account.register(ctx.message.author.id)); 
-        return
+      users = await core.economy.get_國庫()
+      bank_amt = int(users[1])
+      當周 = int(users[0]) 
+      webhook.delete(embed_)
+      embed = DiscordEmbed(title="國庫")
+      embed.add_embed_field(name="餘額：", value="**{}**".format(bank_amt))
+      embed.add_embed_field(name="當周所得：", value="**{}**".format(當周))
+      webhook.add_embed(embed)
+      webhook.delete(embed_)
+      webhook.execute(embed)
+     
 
-  @commands.command()
-  async def MenuBal(self, ctx):
-    webhook = DiscordWebhook(url='https://discord.com/api/webhooks/847789988602183720/RVEzJMCjnMUCp8ToD0iIYC6DrwQUNVh1l0ZCZSk4Pu7Eych237rTZhzZNOvGO_GXWp7D')
-
-    embed = DiscordEmbed(title="銀行帳戶信息:", color='0xf5a623', description="你的餘額是： `{}`".format(core.account.bal(ctx.message.author.id)))
-    webhook.add_embed(embed)
-    webhook.execute()
-
-  @commands.command()
-  async def bank(self, ctx, regi: discord.User = None):
+    @commands.cooldown(1, 10, commands.BucketType.user)     
+    @commands.command(aliases=['p','bank','BANK','Bank','P'])
+    @commands.guild_only()
+    async def profile(self, ctx, regi: discord.Member = None):
+        webhook = DiscordWebhook(url=WEBHOOK_URL)
+        embed_ = await core.economy.loading()
+        user = ctx.author 
+        user1 = user
+        await core.economy.open_bank(user)
+                                        
+        users = await core.economy.get_bank_data(user)
         if (regi is not None and regi.bot) or ctx.author.bot:
-            webhook = DiscordWebhook(url='https://discord.com/api/webhooks/847789988602183720/RVEzJMCjnMUCp8ToD0iIYC6DrwQUNVh1l0ZCZSk4Pu7Eych237rTZhzZNOvGO_GXWp7D', content='該用戶是BOT，不能擁有一個帳戶')
+            webhook.delete(embed_)
+            webhook = DiscordWebhook(url=WEBHOOK_URL, content='該用戶是一個BOT，不能擁有一個帳戶')
             webhook.execute(); return
         elif not regi:
-            if core.account.bal(ctx.message.author.id) is None:
-                webhook = DiscordWebhook(url='https://discord.com/api/webhooks/847789988602183720/RVEzJMCjnMUCp8ToD0iIYC6DrwQUNVh1l0ZCZSk4Pu7Eych237rTZhzZNOvGO_GXWp7D', content='請參照此格式 `Creg`進行開戶')
-                webhook.execute(); return
-            else:
-                webhook = DiscordWebhook(url='https://discord.com/api/webhooks/847789988602183720/RVEzJMCjnMUCp8ToD0iIYC6DrwQUNVh1l0ZCZSk4Pu7Eych237rTZhzZNOvGO_GXWp7D')
 
-                embed = DiscordEmbed(title="銀行帳戶信息:", color='0xf5a623', description="你的餘額是： `{}`".format(core.account.bal(ctx.message.author.id)))
+                avatar_url = str(user1.avatar_url)
+                users = await core.economy.get_bank_data(user)
+                wallet_amt = int(users[0])
+                bank_amt = int(users[1])
+                bank_lv = int(users[4])
+                薪資 = int(users[3])
+                利息 = users[5]
+                new_銀行等階 = int(users[6])   
+                利息等階 = int(users[7]) 
+                利息等階_data = await core.economy.利息_data(利息等階)
+                利息等階圖示 = 利息等階_data[0]
+                利息等階名稱 = 利息等階_data[1]
+
+                存額等階_data = await core.economy.存額_data(new_銀行等階)
+                new_銀行等階圖示 = 存額等階_data[0]
+                銀行等階名稱 = 存額等階_data[1]
+
+                embed = DiscordEmbed(title="一般用戶".format(user.name), color=MAIN_COLOR)
+                embed.set_author(name="{}的個人簡介".format(user.name), icon_url=avatar_url)
+
+                embed.add_embed_field(name="金錢", value=" \n 薪資： **{}** \n\n現金餘額：**{}**    \n銀行餘額：**{}**".format(薪資,wallet_amt, bank_amt), inline=False)
+                embed.add_embed_field(name="銀行存款等階：", value="[ {} ] {} \n [等級：**{}** ] \n 銀行存款額度：{}".format(new_銀行等階圖示,銀行等階名稱,new_銀行等階,bank_lv), inline=True)
+                embed.add_embed_field(name="銀行會員等階", value=f"[ {利息等階圖示} ] {利息等階名稱} \n [等級：**{利息等階}** ] \n利息：**{round(利息, 2)}**", inline=True)
+                embed.add_embed_field(name="一般", value=f"暱稱：`{user.nick}` \n帳號創建於：`{user.created_at.__format__('%Y年%m月%d日 %H:%M:%S')}` \n加入時間：`{user.joined_at.__format__('%Y年%m月%d日 %H:%M:%S')}` ", inline=False)
                 webhook.add_embed(embed)
+                webhook.delete(embed_)
                 webhook.execute(); return
     
         elif regi is not None:
-            print(regi.id)
-            if core.account.bal(regi.id) is None:
-                webhook = DiscordWebhook(url='https://discord.com/api/webhooks/847789988602183720/RVEzJMCjnMUCp8ToD0iIYC6DrwQUNVh1l0ZCZSk4Pu7Eych237rTZhzZNOvGO_GXWp7D', content='該用戶不存在或尚未註冊銀行帳戶。')
-                webhook.execute(); return
-            else:
-                webhook = DiscordWebhook(url='https://discord.com/api/webhooks/847789988602183720/RVEzJMCjnMUCp8ToD0iIYC6DrwQUNVh1l0ZCZSk4Pu7Eych237rTZhzZNOvGO_GXWp7D')
+            regi1 = await core.economy.get_bank_data(regi)
+            wallet_amt = int(regi1[0])
+            bank_amt = int(regi1[1])
+            bank_lv = int(regi1[4])
+            薪資 = int(regi1[3])
+            利息 = regi1[5]
+            new_銀行等階 = int(regi1[6])  
+            利息等階 = int(regi1[7]) 
+            利息_data = await core.economy(利息等階)
+            利息等階圖示 = 利息_data[0]
+            利息等階名稱 = 利息_data[1]
+            存額_data = await core.economy(new_銀行等階)
+            new_銀行等階圖示 = 存額_data[0]
+            銀行等階名稱 = 存額_data[1]
+            
+            embed = DiscordEmbed(title="一般用戶".format(regi.name), color=MAIN_COLOR)
+            embed.set_author(name="{}的個人簡介".format(regi.name))
+            embed.add_embed_field(name="金錢", value="\n 薪資： **{}** \n\n現金餘額：**{}**    \n銀行餘額：**{}**".format(薪資,wallet_amt, bank_amt), inline=False)
+            embed.add_embed_field(name="銀行存款等階：", value="[ {} ] {} \n [等級：{}] \n 銀行存款額度：{}".format(new_銀行等階圖示,銀行等階名稱,new_銀行等階,bank_lv), inline=True)
+            embed.add_embed_field(name="銀行會員等階", value=f"[ {利息等階圖示} ] {利息等階名稱} \n [等級：**{利息等階}** ] \n利息：**{round(利息, 2)}**", inline=True)
+            embed.add_embed_field(name="一般", value=f"暱稱：`{regi.nick}` \n帳號創建於：`{regi.created_at.__format__('%Y年%m月%d日 %H:%M:%S')}` \n加入時間：`{regi.joined_at.__format__('%Y年%m月%d日 %H:%M:%S')}` ", inline=False)
 
-                embed = DiscordEmbed(title='銀行賬戶信息：', color='0xf5a800', description='{}的餘額是： `{}`'.format(regi.display_name, core.account.bal(regi.id)))
+            webhook.add_embed(embed)
+            webhook.delete(embed_)
+            webhook.execute(); return
+
+    @commands.cooldown(1, 10, commands.BucketType.user)
+    @commands.command(aliases=['pay'])
+    @commands.guild_only()
+    async def send(self, ctx,member : discord.Member,amount = None):  
+        webhook = DiscordWebhook(url=WEBHOOK_URL)
+        embed_ = await core.economy.loading()
+        await core.economy.open_bank(ctx.author)
+        await core.economy.open_bank(member)
+        if amount == None:
+            embed=DiscordEmbed(title=":warning: 錯誤！", description="請輸入金額。", color=ORANGE_COLOR)
+            webhook.add_embed(embed)
+            webhook.execute()    
+            webhook.delete(embed_)   
+            return
+
+        bal = await core.economy.get_bank_data(ctx.author)
+        member_bal = await core.economy.get_bank_data(member)
+        if amount == 'all':
+            amount = bal[1]
+
+        amount = int(amount)
+
+        if amount > bal[1]:
+            embed=DiscordEmbed(title=":warning: 錯誤！", description="你沒有足夠的餘額。", color=ORANGE_COLOR)
+            webhook.add_embed(embed)
+            webhook.execute()    
+            webhook.delete(embed_)   
+            return
+        if amount < 0:
+            embed=DiscordEmbed(title=":warning: 錯誤！", description="金額不可為負！", color=ORANGE_COLOR)
+            webhook.add_embed(embed)
+            webhook.execute()  
+            webhook.delete(embed_)
+            return
+        if amount >= int(member_bal[4]):
+            embed=DiscordEmbed(title=":warning: 錯誤！", description="你給予的金額超過了對方的存款額度！", color=ORANGE_COLOR)
+            webhook.add_embed(embed)
+            webhook.delete(embed_)
+            webhook.execute()  
+            return
+
+        await core.economy.update_bank(ctx.author,-1*amount,"銀行餘額")
+        await core.economy.update_bank(member,amount,"銀行餘額")
+        embed=DiscordEmbed(title="成功執行！", description=f"{ctx.author.mention} 給了 {member} {amount} 元簡明幣。", color=MAIN_COLOR)
+        webhook.add_embed(embed)
+        webhook.delete(embed_)
+        webhook.execute()
+
+    @commands.cooldown(1, 10, commands.BucketType.user)
+    @commands.command()
+    async def payday(self, ctx):
+        await ctx.send("看來你是個活在過去的老人呢！我們已經有自動予以薪資的福利了。")
+
+    @commands.cooldown(1, 10, commands.BucketType.user)
+    @commands.command(aliases=["reward"])
+    @commands.has_permissions(administrator=True)
+    async def 賞(self, ctx ,user : discord.User, *,amount= None):
+        webhook = DiscordWebhook(url=WEBHOOK_URL)
+        amount = int(amount)
+        await core.economy.open_bank(user)
+        await core.economy.update_bank(user,amount,"現金")
+        embed=DiscordEmbed(title="成功執行！", description=f"{ctx.author.mention} 給了 {user} {amount} 元簡明幣。", color=MAIN_COLOR)
+        webhook.add_embed(embed)
+        webhook.execute()
+
+    @commands.cooldown(1, 10, commands.BucketType.user)
+    @commands.command(aliases=["amerce"])
+    @commands.has_permissions(administrator=True)
+    async def 罰(self, ctx, member : discord.User, *,amount= None):
+        webhook = DiscordWebhook(url=WEBHOOK_URL)        
+        amount = int(amount)
+        await core.economy.open_bank(member)
+        await core.economy.update_bank(member,-1*amount,"現金")
+        embed=DiscordEmbed(title="成功執行！", description=f"{ctx.author.mention} 罰了 {member} {amount} 元簡明幣。", color=MAIN_COLOR)
+        webhook.add_embed(embed)
+        webhook.execute()
+
+    @commands.cooldown(1, 10, commands.BucketType.user)      
+    @commands.command(aliases=["UP"])
+    @commands.guild_only()
+    async def up(self, ctx,mode = None, amount = None):
+      embed_ = await core.economy.loading()
+      webhook = DiscordWebhook(url=WEBHOOK_URL)
+      user = ctx.author
+      if mode is None:
+        await ctx.send("請選擇欲升級之對象：`Cup 利息 [all]` 或是 `Cup 存額 [all]` (`[all]` 非必填)")
+        webhook.delete(embed_)   
+        return
+      if mode == "存額":
+          if amount is not None:
+            if amount.lower() == "all" or amount.lower() == "max":
+              所有的_users = await core.economy.get_bank_data(user)
+              所有的_存款額度 = int(所有的_users[4])
+              所有的_銀行等階 = int(所有的_users[6])
+              所有的_現金 = int(所有的_users[0])
+              if 所有的_銀行等階 <= 100:
+                    new_amt_存款額度 = (所有的_銀行等階 **2 * 100000) - 所有的_存款額度
+              elif 所有的_銀行等階 <= 1000:
+                    new_amt_存款額度 = (所有的_銀行等階 **2 * 10000) - 所有的_存款額度
+              elif 所有的_銀行等階 < 10000:
+                    new_amt_存款額度 = (所有的_銀行等階 **2 * 5000) - 所有的_存款額度
+              elif 所有的_銀行等階 >= 10000:
+                    new_amt_存款額度 = (所有的_銀行等階 **2 * 1000) - 所有的_存款額度
+              if 所有的_銀行等階 <= 100:
+                    扣比 = -0.95
+              elif 所有的_銀行等階 <= 1000:
+                    扣比 = -0.55
+              elif 所有的_銀行等階 <= 10000:
+                    扣比 = -0.35
+              elif 所有的_銀行等階 > 10000:
+                    扣比 = -0.15
+              要扣的錢 = new_amt_存款額度 * 扣比
+              data = 0
+              print('3')
+              if -1*要扣的錢 == 所有的_現金+要扣的錢:
+                data+=1
+              if -1*要扣的錢 < 所有的_現金:
+                data += 1
+              elif -1*要扣的錢 > 所有的_現金+要扣的錢:
+                if data != 1:
+                  await ctx.send(f"你的現金不足{round(-1*要扣的錢)}，這將使你無法提升任何一銀行等階。\n你可以使用`Cwith {round(-1*要扣的錢)}`將現金從銀行取出。")  
+                  webhook.delete(embed_)   
+                  return  
+              真_要扣的錢 = 0
+              所有的_現金 += 要扣的錢
+              while 所有的_現金+要扣的錢 > 要扣的錢 and 所有的_現金+要扣的錢 >= 0:
+                  
+                  所有的_銀行等階 += 1
+                  if 所有的_銀行等階 <= 100:
+                    new_amt_存款額度 = (所有的_銀行等階 **2 * 100000) - 所有的_存款額度
+                  elif 所有的_銀行等階 <= 1000:
+                    new_amt_存款額度 = (所有的_銀行等階 **2 * 10000) - 所有的_存款額度
+                  elif 所有的_銀行等階 < 10000:
+                    new_amt_存款額度 = (所有的_銀行等階 **2 * 5000) - 所有的_存款額度
+                  elif 所有的_銀行等階 >= 10000:
+                    new_amt_存款額度 = (所有的_銀行等階 **2 * 1000) - 所有的_存款額度
+                  if 所有的_銀行等階 <= 100:
+                    扣比 = -0.95
+                  elif 所有的_銀行等階 <= 1000:
+                    扣比 = -0.55
+                  elif 所有的_銀行等階 <= 10000:
+                    扣比 = -0.35
+                  elif 所有的_銀行等階 > 10000:
+                    扣比 = -0.15
+                  扣錢 = new_amt_存款額度 * 扣比
+                  所有的_現金 += 扣錢
+                  真_要扣的錢 += new_amt_存款額度 * 扣比
+
+
+              await core.economy.update_bank(user, 真_要扣的錢,"現金")
+              await core.economy.update_bank(user, new_amt_存款額度 ,"存款額度")
+              await core.economy.update_bank(user, 所有的_銀行等階,"銀行等階")
+              NEW_users = await core.economy.get_bank_data(user)
+              NEW_存款額度 = int(NEW_users[4])
+              new_銀行等階 = int(NEW_users[6])   
+              存額等階_data = await core.economy.存額_data(new_銀行等階)
+              new_銀行等階圖示 = 存額等階_data[0]
+
+              await ctx.send(f"{new_銀行等階圖示}：你的存款上限已上升至**{NEW_存款額度}**。")
+              webhook.delete(embed_)  
+              return 
+            else:
+              await ctx.send("請輸入`Cup 存額 [all / max]`")
+              webhook.delete(embed_)   
+          else:
+              users = await core.economy.get_bank_data(user)
+              一等_存款額度 = int(users[4])
+              一等_銀行等階 = int(users[6])
+              一等_現金 = int(users[0])
+              if 一等_銀行等階 <= 100:
+                    new_amt_存款額度 = (一等_銀行等階 **2 * 100000) - 一等_存款額度
+              elif 一等_銀行等階 <= 1000:
+                    new_amt_存款額度 = (一等_銀行等階 **2 * 10000) - 一等_存款額度
+              elif 一等_銀行等階 < 10000:
+                    new_amt_存款額度 = (一等_銀行等階 **2 * 5000) - 一等_存款額度
+              elif 一等_銀行等階 >= 10000:
+                    new_amt_存款額度 = (一等_銀行等階 **2 * 1000) - 一等_存款額度
+              if 一等_銀行等階 <= 100:
+                扣比 = -0.95
+              elif 一等_銀行等階 <= 1000:
+                扣比 = -0.55
+              elif 一等_銀行等階 <= 10000:
+                扣比 = -0.35
+              elif 一等_銀行等階 > 10000:
+                扣比 = -0.15
+              一等_要扣的錢 = new_amt_存款額度 * 扣比
+              new_銀行等階 =  一等_銀行等階 + 1
+              data = 0
+              if -1*一等_要扣的錢 == 一等_現金:
+                  data += 1
+              if -1*一等_要扣的錢 < 一等_現金:
+                  data += 1
+              elif -1*一等_要扣的錢 > 一等_現金+一等_要扣的錢 :
+                if data != 1:
+                  await ctx.send(f"你的現金不足{round(-1*一等_要扣的錢)}，你可以使用`Cwith {round(-1*一等_要扣的錢)}`將現金從銀行取出。")    
+                  webhook.delete(embed_)   
+                  return    
+              存額等階_data = await core.economy.存額_data(new_銀行等階)
+              new_銀行等階圖示 = 存額等階_data[0]           
+                          
+
+              await core.economy.update_bank(user, 一等_要扣的錢,"現金")
+              await core.economy.update_bank(user, new_amt_存款額度 ,"存款額度")
+              await core.economy.update_bank(user, 1,"銀行等階")
+
+              await ctx.send(f"{new_銀行等階圖示}：你的存款上限已上升**{new_amt_存款額度}**至**{new_amt_存款額度 + 一等_存款額度}**。")
+              webhook.delete(embed_)   
+              return
+      if mode.lower() == "信用卡":
+        if amount is not None:
+          if amount.lower() == "all" or amount.lower() == "max":          
+            users = await core.economy.get_bank_data(user)
+            現金 = int(users[0])
+            利息等階 = int(users[7])
+            要扣的錢 = (利息等階 ** 2 *50000000)*-1
+            利息 = round(0.1, 1)
+            data = 0
+            if 現金 == -1*要扣的錢:
+              data +=1
+            if -1*要扣的錢 < 現金:
+                data += 1
+            if 現金+要扣的錢 < -1*要扣的錢:
+              if data != 1:
+                embed=DiscordEmbed(title=":warning: 錯誤！", description=f"你的現金不足{round(-1*要扣的錢)}，這將使你無法提升任何一信用卡階級。\n你可以使用`Cwith {round(-1*要扣的錢)}`將現金從銀行取出。", color=ORANGE_COLOR)
                 webhook.add_embed(embed)
-                webhook.execute(); return
-                
-  @commands.command(name='salary', aliases=['SY','薪水'])
-  async def salary(self, ctx):
-        webhook = DiscordWebhook(url='https://discord.com/api/webhooks/847789988602183720/RVEzJMCjnMUCp8ToD0iIYC6DrwQUNVh1l0ZCZSk4Pu7Eych237rTZhzZNOvGO_GXWp7D')
+                webhook.execute()    
+                webhook.delete(embed_)   
+                return
+            while 現金+要扣的錢 > 0 and 利息等階 == 5:
+                  利息等階+=1
+                  利息 += round(0.1, 1)
+                  要扣的錢 = (利息等階 ** 2 *500000)*-1*0.55
+                  現金+=要扣的錢
+            await core.economy.update_bank(user, 要扣的錢,"現金")
+            await core.economy.update_bank(user,利息,"利息")
+            await core.economy.update_bank(user, 1,"利息等階")
+            NEW_users = await core.economy.get_bank_data(user)
+            NEW_利息 = int(NEW_users[5])
+            利息等階_data = await core.economy.利息_data(利息等階)
+            利息等階圖示 = 利息等階_data[0]
+            利息等階名稱 = 利息等階_data[1]
+            await ctx.send(f"你已晉升至{利息等階圖示}**{利息等階名稱}**。你的銀行利息變更為{round(NEW_利息-1, 3)*100}%/每2小時。")
+            webhook.delete(embed_)   
+            return
+          else:
+              await ctx.send("請輸入`Cup 信用卡 [all / max]`")
+              webhook.delete(embed_)   
+        else:
+          users = await core.economy.get_bank_data(user)
+          現金 = int(users[0]) 
+          利息等階 = int(users[7]) 
+          利息= round(0.1, 1)
+          NEW_利息 = int(users[5])
+          要扣的錢 = (利息等階 ** 2 *500000)*-1*0.55
+          data = 0
+          if -1*要扣的錢 == 現金+要扣的錢:
+                data += 1
+          if -1*要扣的錢 < 現金:
+                data += 1
+          elif -1*要扣的錢 > 現金+要扣的錢:
+              if data != 1:
+                await ctx.send(f"你的現金不足{round(-1*要扣的錢)}，你可以使用`Cwith {round(-1*要扣的錢)}`將現金從銀行取出。")    
+                webhook.delete(embed_)   
+                return    
+          if 利息等階 == 5:
+            await ctx.send(f"目前開放的最高卡種為無限卡。")    
+            webhook.delete(embed_)   
+            return
+
+          await core.economy.update_bank(user, 要扣的錢,"現金")
+          await core.economy.update_bank(user,利息,"利息")
+          await core.economy.update_bank(user, 1,"利息等階")
+          users = await core.economy.get_bank_data(user)
+          利息等階 = int(users[7]) 
+          NEW_利息 = round(users[5], 3)
+          利息等階_data = await core.economy.利息_data(利息等階)
+          利息等階圖示 = 利息等階_data[0]
+          利息等階名稱 = 利息等階_data[1]
+
+          await ctx.send(f"你已晉升至{利息等階圖示}**{利息等階名稱}**。你的銀行利息變更為**{round(NEW_利息-1, 3)*100}%**/**每小時**")
+          webhook.delete(embed_)   
+          return
+      else:
+        await ctx.send("請輸入`Cup (存額 / 信用卡) [all / max]`")
+        webhook.delete(embed_)   
+             
+    @commands.command(aliases=["with"])
+    @commands.cooldown(1, 10, commands.BucketType.user)
+    @commands.guild_only()
+    async def withdraw(self, ctx, *,amount= None):
+        user = ctx.author
+
+
+        users = await core.economy.get_bank_data(user)
+
+        bank_amt = users[1]
+
+        if amount.lower() == "all" or amount.lower() == "max":
+            await core.economy.update_bank(user, +1*bank_amt)
+            await core.economy.update_bank(user, -1*bank_amt, "銀行餘額")
+            embed=discord.Embed(title="成功執行！", description=f"{user.mention} 你取出了 {users[1]} 元 從你的銀行中。", color=MAIN_COLOR)
+            await ctx.send(embed=embed)    
+            return
+
+        amount = int(amount)
+
+        if amount > bank_amt:
+            await ctx.message.delete()
+            embed=discord.Embed(title=":warning: 錯誤！", description="你沒有足夠的餘額。", color=ORANGE_COLOR)
+            await ctx.send(embed=embed)    
+            return
+
+        if amount < 0:
+            await ctx.message.delete()
+            embed=discord.Embed(title=":warning: 錯誤！", description="金額不可為負！", color=ORANGE_COLOR)
+            await ctx.send(embed=embed)    
+            return
+
+        await core.economy.update_bank(user, +1 * amount)
+        await core.economy.update_bank(user, -1 * amount, "銀行餘額")
+
+        embed=discord.Embed(title="成功執行！", description=f"{user.mention} 你取出了 {amount} 元 從你的銀行中。", color=MAIN_COLOR)
+        await ctx.send(embed=embed)    
+
+
+    @commands.command(aliases=["dep"])
+    @commands.cooldown(1, 10, commands.BucketType.user)
+    @commands.guild_only()
+    async def deposit(self, ctx, *,amount= None):
+        webhook = DiscordWebhook(url=WEBHOOK_URL)
+        embed_ = await core.economy.loading()
+        user = ctx.author
+
+
+        users = await core.economy.get_bank_data(user)
+
+
+        wallet_amt = users[0]
+
+        if amount.lower() == "all" or amount.lower() == "max":
+            if int(users[0]) > int(users[4]) - int(users[1]):
+              webhook = DiscordWebhook(url=WEBHOOK_URL, content=f'你的銀行存款額度為**{users[4]}**，請提升銀行額度。')
+              webhook.delete(embed_)
+              webhook.execute(); return
+            await core.economy.update_bank(user, -1*wallet_amt)
+            await core.economy.update_bank(user, +1*wallet_amt, "銀行餘額")
+            webhook = DiscordWebhook(url=WEBHOOK_URL, content=f"{user.mention} 你存入了 {wallet_amt}元 至你的銀行。")
+            webhook.delete(embed_)
+            webhook.execute(); return
+        else:
+          if int(amount)+int(users[1]) > int(users[4]):
+            webhook.delete(embed_)
+            webhook = DiscordWebhook(url=WEBHOOK_URL, content=f"你的銀行存款額度為**{users[4]}**，請提升銀行額度。")
+            webhook.execute(); return
+
+          amount = int(amount)
+
+          if amount > wallet_amt:
+            webhook.delete(embed_)
+            webhook = DiscordWebhook(url=WEBHOOK_URL, content=f"{user.mention} 你沒有足夠的錢，ㄏㄏ")
+            webhook.execute(); return
+
+          if amount < 0:
+            webhook.delete(embed_)
+            webhook = DiscordWebhook(url=WEBHOOK_URL, content=f"{user.mention} 金額不可為負！")
+            webhook.execute(); return
+
+          await core.economy.update_bank(user, -1 * amount)
+          await core.economy.update_bank(user, +1 * amount, "銀行餘額")
+          users = await core.economy.get_bank_data(user)
+          餘額 = users[1]
+          webhook.delete(embed_)
+          webhook = DiscordWebhook(url=WEBHOOK_URL, content=f"{user.mention} 你存入了 **{amount}** 元 至你的**銀行！**\n你的銀行餘額現在有**{round(餘額)}**元！")
+          webhook.execute()
+
+    @commands.command(aliases=['SY','薪水','Salary','SALARY'])
+    @commands.cooldown(1, 10, commands.BucketType.user)
+    async def salary(self, ctx):
+        webhook = DiscordWebhook(url=WEBHOOK_URL)
 
         embed = DiscordEmbed(title='🏦簡明銀行公告•', color='0x00bfff', description='此處列出各公職薪資如下')
         embed.add_embed_field(name="總統", value="壹拾萬圓簡明幣", inline=True)
@@ -317,77 +666,11 @@ class Economy(Cog_Extension):
         webhook.add_embed(embed)
         webhook.execute()
 
-  @commands.command()
-  async def pay(self, ctx, regi: discord.User = None, amount=None):
-        if (regi is not None and regi.bot) or ctx.author.bot:
-            webhook = DiscordWebhook(url='https://discord.com/api/webhooks/847789988602183720/RVEzJMCjnMUCp8ToD0iIYC6DrwQUNVh1l0ZCZSk4Pu7Eych237rTZhzZNOvGO_GXWp7D', content='該用戶是BOT，不能擁有一個帳戶')
-            webhook.execute(); return
-        if amount is None:
-          webhook = DiscordWebhook(url='https://discord.com/api/webhooks/847789988602183720/RVEzJMCjnMUCp8ToD0iIYC6DrwQUNVh1l0ZCZSk4Pu7Eych237rTZhzZNOvGO_GXWp7D', content='請使用此格式指定付款金額： `Cpay @國民名稱 金額`')
-          webhook.execute(); return
-        try:
-            amount = int(amount)
-        except ValueError:
-          webhook = DiscordWebhook(url='https://discord.com/api/webhooks/847789988602183720/RVEzJMCjnMUCp8ToD0iIYC6DrwQUNVh1l0ZCZSk4Pu7Eych237rTZhzZNOvGO_GXWp7D', content='請輸入整數。 ~~TMD這判斷函式我寫了N小時~~ ')
-          webhook.execute(); return
-        await ctx.send(core.account.pay(ctx.message.author.id, regi.id, amount))
-
-  @commands.command()
-  async def payday(self, ctx):
-        await ctx.send(core.account.payday(ctx.message.author.id))
-
-  @commands.command()
-  async def 賞(self, ctx, regi: discord.User = None, amount2=None):
-        if (regi is not None and regi.bot) or ctx.author.bot:
-            webhook = DiscordWebhook(url='https://discord.com/api/webhooks/847789988602183720/RVEzJMCjnMUCp8ToD0iIYC6DrwQUNVh1l0ZCZSk4Pu7Eych237rTZhzZNOvGO_GXWp7D', content='該用戶是BOT，不能擁有一個帳戶')
-            webhook.execute(); return
-        if amount2 is None:
-            webhook = DiscordWebhook(url='https://discord.com/api/webhooks/847789988602183720/RVEzJMCjnMUCp8ToD0iIYC6DrwQUNVh1l0ZCZSk4Pu7Eych237rTZhzZNOvGO_GXWp7D', content='請使用此格式指定賞金： `C罰 @國民名稱 金額`')
-            webhook.execute(); return
-        try:
-            amount2 = int(amount2)
-        except ValueError:
-            webhook = DiscordWebhook(url='https://discord.com/api/webhooks/847789988602183720/RVEzJMCjnMUCp8ToD0iIYC6DrwQUNVh1l0ZCZSk4Pu7Eych237rTZhzZNOvGO_GXWp7D', content='請輸入整數。 ~~TMD這判斷函式我寫了N小時~~ ')
-            webhook.execute(); return
-        await ctx.send(core.account.賞(ctx.message.author.id, regi.id, amount2))
-
-  @commands.command()
-  async def rob(self, ctx, ramount=None):
-        if ramount is None:
-          webhook = DiscordWebhook(url='https://discord.com/api/webhooks/847789988602183720/RVEzJMCjnMUCp8ToD0iIYC6DrwQUNVh1l0ZCZSk4Pu7Eych237rTZhzZNOvGO_GXWp7D', content='請參照此格式輸入賭注的金額：`Crob 金額`。')
-          webhook.execute(); return
-        try:
-            ramount = int(ramount)
-        except ValueError:
-            webhook = DiscordWebhook(url='https://discord.com/api/webhooks/847789988602183720/RVEzJMCjnMUCp8ToD0iIYC6DrwQUNVh1l0ZCZSk4Pu7Eych237rTZhzZNOvGO_GXWp7D', content='請輸入整數。 ~~TMD這判斷函式我寫了N小時~~ ')
-            webhook.execute(); return
-        await ctx.send(core.account.rob(ctx.message.author.id, ramount))
-
-  @commands.command()
-  async def srob(self, ctx):
-        await ctx.send(core.account.rob(ctx.message.author.id, 3000))
-
-  @commands.command()
-  async def 罰(self, ctx, regi: discord.User = None, amount2=None):
-        if (regi is not None and regi.bot) or ctx.author.bot:
-            webhook = DiscordWebhook(url='https://discord.com/api/webhooks/847789988602183720/RVEzJMCjnMUCp8ToD0iIYC6DrwQUNVh1l0ZCZSk4Pu7Eych237rTZhzZNOvGO_GXWp7D', content='該用戶是BOT，不能擁有一個帳戶')
-            webhook.execute(); return
-        if amount2 is None:
-          webhook = DiscordWebhook(url='https://discord.com/api/webhooks/847789988602183720/RVEzJMCjnMUCp8ToD0iIYC6DrwQUNVh1l0ZCZSk4Pu7Eych237rTZhzZNOvGO_GXWp7D', content='請參照此格式指定罰金： `C罰 @國民名稱 金額`')
-          webhook.execute(); return
-        try:
-            amount2 = int(amount2)
-        except ValueError:
-            webhook = DiscordWebhook(url='https://discord.com/api/webhooks/847789988602183720/RVEzJMCjnMUCp8ToD0iIYC6DrwQUNVh1l0ZCZSk4Pu7Eych237rTZhzZNOvGO_GXWp7D', content='請輸入整數。 ~~TMD這判斷函式我寫了N小時~~ ')
-            webhook.execute(); return
-        await ctx.send(core.account.罰(ctx.message.author.id, regi.id, amount2))
-
-  @commands.command()
-  async def count(self, ctx):
-    webhook = DiscordWebhook(url='https://discord.com/api/webhooks/847789988602183720/RVEzJMCjnMUCp8ToD0iIYC6DrwQUNVh1l0ZCZSk4Pu7Eych237rTZhzZNOvGO_GXWp7D', content='已經有{}個國民已開戶。'.format(core.account.count()))
-    webhook.execute()
-
+    @commands.command()
+    @commands.cooldown(1, 10, commands.BucketType.user)
+    async def shop(self, ctx):
+        embed = discord.Embed(colour=discord.Colour(0xfdf74e),description="**如欲購買物品請使用`Cbuy 物品 [數量]`**\n\n**CC-OSV SHOP - Page 1/2**\n<:__:852028673363279893> `card` - 普卡，可以減免3%的稅。日後可升級 。 | **3,000** <:coin:852035374636728320>\n<:__:852032874940858380> `luckyclover` - 為賭博性質的遊戲提升些許成功機率。 | **77,777** <:coin:852035374636728320>\n<:NTD:852048045695827988> `NTD` - 簡明幣🔀新台幣20$ | **1e20** <:coin:852035374636728320>\n⌚ `watch` - 可見顯示現在時間之頻道。 | **200,000** <:coin:852035374636728320>\n<:key:852056890707279892> `namecolor` - 獲取進入<#846673897079308288>的頻道鑰匙。 | **2,000,000** <:coin:852035374636728320>\n<:key:852056890707279892> `BGTutorials` - 購買Discord背景更換教學。 | **99,879** <:coin:852035374636728320> ")
+        await ctx.send(embed = embed)
 
 def setup(bot):
-  DiscordComponents(bot)
-  bot.add_cog(Economy(bot))
+   bot.add_cog(Mongo(bot))

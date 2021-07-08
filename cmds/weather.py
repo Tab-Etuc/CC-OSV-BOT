@@ -55,7 +55,7 @@ class Weather(commands.Cog):
         )
 
     @commands.command()
-    @commands.cooldown(1, 7, commands.BucketType.user)
+    @commands.cooldown(1, 10, commands.BucketType.user)
     async def weather(self, ctx, *, location = None):
         if location == None:
             await ctx.send("Please enter a location. Usage: `e!weather <location>`")

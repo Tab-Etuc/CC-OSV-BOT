@@ -11,7 +11,8 @@ with open(r'./settings/message_process.json', mode='r', encoding='utf8') as Mess
     MessageData = json.load(MessageFile)
 
 class Main(Cog_Extension):
-  @commands.command(aliases=['python', 'botinfo'])
+  @commands.cooldown(1, 10, commands.BucketType.user)
+  @commands.command(aliases=['python', 'botinfo','BOT'])
   async def bot(self, ctx):
         values = psutil.virtual_memory()
         val2 = values.available * 0.001
@@ -40,54 +41,7 @@ class Main(Cog_Extension):
                           f'\n可用的 RAM 數 - {round(val4, 2)} GB')
 
         await ctx.send(embed=embedve)
-
-  @commands.command(name = 'userinfo', aliases=['user', 'uinfo', 'ui'])
-  async def userinfo(self, ctx, *, name=""):
-        """Get user info. Ex: ~user @user"""
-        if name:
-            try:
-                user = ctx.message.mentions[0]
-            except IndexError:
-                user = ctx.guild.get_member_named(name)
-            try:
-                if not user:
-                    user = ctx.guild.get_member(int(name))
-                if not user:
-                    user = self.bot.get_user(int(name))
-            except ValueError:
-                pass
-            if not user:
-                await ctx.send('User not found :man_frowning_tone1:')
-                return
-        else:
-            user = ctx.message.author
-
-        if isinstance(user, discord.Member):
-            role = user.top_role.name
-            if role == "@everyone":
-                role = "N/A"
-
-        em = discord.Embed(colour=0x00CC99)
-        em.add_field(name='User ID', value=f'`{user.id}`')
-        if isinstance(user, discord.Member):
-            if isinstance(user.activity, discord.Spotify):
-                activity = "Listening " + user.activity.title
-            elif user.activity is not None: 
-                activity = str(user.activity.type)[13:].title() + ' ' + user.activity.name
-            else:
-                activity = None
-
-            em.add_field(name='暱稱', value=f'`{user.nick}`')
-            em.add_field(name='狀態', value=f'`{activity}`')
-        em.add_field(name='用戶創建於：', value=f"`{user.created_at.__format__('%A, %d %B %Y @ %H:%M:%S')}`", inline=False)
-        if isinstance(user, discord.Member):
-            em.add_field(name='加入時間：', value=f"`{user.joined_at.__format__('%A, %d %B %Y @ %H:%M:%S')}`", inline=False)
-        
-        try:
-            await ctx.send(embed=em)
-        except Exception:
-            await ctx.send("I don't have permission to send embeds here :disappointed_relieved:")
-  
+  @commands.cooldown(1, 10, commands.BucketType.user)
   @commands.command(name='sinfo', aliases=['server'])
   async def serverinfo(self, ctx, *, name:str = ""):
         """Get server info"""
@@ -121,7 +75,7 @@ class Main(Cog_Extension):
         em = discord.Embed(color=0x00CC99)
         em.add_field(name='國名', value=f'`{server.name}`')
         em.add_field(name='總統', value=f'`煞氣TM爺爺#5692`', inline=False)
-        em.add_field(name='國民數', value=f'`{server.member_count}`')
+        em.add_field(name='國民數', value=f'`{server.member_count-6}`')
         em.add_field(name='表情符號數', value=f'`60`')
         em.add_field(name='文字頻道數', value=f'`{tchannel_count}`')
         em.add_field(name='語音頻道數', value=f'`{vchannel_count}`')
@@ -135,8 +89,8 @@ class Main(Cog_Extension):
             await ctx.send(embed=em)
         except Exception:
             await ctx.send("I don't have permission to send embeds here :disappointed_relieved:")
-  
-  @commands.command()
+  @commands.cooldown(1, 10, commands.BucketType.user)
+  @commands.command(aliases=['Ping', 'PING'])
   async def ping(self, ctx):
         ping=abs(int(self.bot.latency*1000))
         embed=discord.Embed(title=f'{ping}(ms)', color=0x73ff00, timestamp=datetime.datetime.now(datetime.timezone.utc))
@@ -144,8 +98,8 @@ class Main(Cog_Extension):
         embed.set_footer(text=f'由{ctx.author}請求的鏈接')
         await ctx.send(embed=embed)
         print(f'【Bot】{ctx.author} take bot\'s ping')
-        
-  @commands.command()
+  @commands.cooldown(1, 10, commands.BucketType.user)
+  @commands.command(aliases=['NITRO', 'nitro'])
   async def Nitro(self, ctx, style:int=1):
         await ctx.message.delete()
         if style == 1:

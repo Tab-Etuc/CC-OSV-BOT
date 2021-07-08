@@ -27,10 +27,11 @@ def Search(search_type, ctx, arg):
 
 
 class search(Cog_Extension):
+    @commands.cooldown(1, 10, commands.BucketType.user)
     @commands.command()
     async def google(self, ctx, arg:str=''):
         await ctx.send(embed=Search('google', ctx, arg))
-
+    @commands.cooldown(1, 10, commands.BucketType.user)
     @commands.command()
     async def wiki(self, ctx, arg:str=''):        
         await ctx.send(embed=Search('wikipedia', ctx, arg))
