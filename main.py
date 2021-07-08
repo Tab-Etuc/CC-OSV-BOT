@@ -1,6 +1,6 @@
 import discord
 from discord.ext import commands, tasks
-import json, os, keep_alive
+import json, os
 from dotenv import load_dotenv
 
 
@@ -29,5 +29,4 @@ for filename in os.listdir('./cmds'):
         bot.load_extension(f'cmds.{filename[:-3]}')
 
 if __name__ == "__main__":
-  keep_alive.keep_alive()
   bot.run(TOKEN2)
