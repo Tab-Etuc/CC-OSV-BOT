@@ -20,8 +20,8 @@ class Task(Cog_Extension):
         cursor.update_many({}, [execute])
         execute2 = {"$set": {"現金": {"$add": ["$現金", "$真實的薪資"]}}}
         db.Bank.update_many({}, [execute2])
-        execute3 = {"$set": {"$銀行餘額": "$存款額度"}}
-        db.Bank.update_many({"銀行餘額":{"$gt" : "$存款額度"}}, [execute3])
+        execute3 = {"$set": {"銀行餘額":{"$min":["$銀行餘額","$存款額度"]}}}
+        db.Bank.update_many({}, [execute3])
         db.Bank.update_one({"_id": "國庫"}, {"$inc": {"當周所得": 1100132}})
 
         print("已進行例行性的給予薪資")
@@ -34,7 +34,7 @@ class Task(Cog_Extension):
   async def test(self,ctx):
       cluster = MongoClient(auth_url)
       db = cluster["Economy"]
-      execute3 = {"$set": {"$銀行餘額": "$存款額度"}}
+      execute3 = {"$set": {"銀行餘額":{"$min":["$銀行餘額","$存款額度"]}}}
       db.Bank.update_many({}, [execute3])
 
   @commands.command()
