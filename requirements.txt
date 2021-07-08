@@ -13,3 +13,5 @@ python-dotenv~=0.17.0
 flask~=2.0.1
 timeago ~=1.0.15
 requests ~=2.25.1
+PyNaCl
+pandas
