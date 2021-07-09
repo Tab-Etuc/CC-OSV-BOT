@@ -485,38 +485,7 @@ class Mongo(Cog_Extension):
       if mode.lower() == "信用卡":
         if amount is not None:
           if amount.lower() == "all" or amount.lower() == "max":          
-            users = await core.economy.get_bank_data(user)
-            現金 = int(users[0])
-            利息等階 = int(users[7])
-            要扣的錢 = (利息等階 ** 2 *50000000)*-1
-            利息 = round(0.1, 1)
-            data = 0
-            if 現金 == -1*要扣的錢:
-              data +=1
-            if -1*要扣的錢 < 現金:
-                data += 1
-            if 現金+要扣的錢 < -1*要扣的錢:
-              if data != 1:
-                embed=DiscordEmbed(title=":warning: 錯誤！", description=f"你的現金不足{round(-1*要扣的錢)}，這將使你無法提升任何一信用卡階級。\n你可以使用`Cwith {round(-1*要扣的錢)}`將現金從銀行取出。", color=ORANGE_COLOR)
-                webhook.add_embed(embed)
-                webhook.execute()    
-                webhook.delete(embed_)   
-                return
-            while 現金+要扣的錢 > 0 and 利息等階 == 5:
-                  利息等階+=1
-                  利息 += round(0.1, 1)
-                  要扣的錢 = (利息等階 ** 2 *500000)*-1*0.55
-                  現金+=要扣的錢
-            await core.economy.update_bank(user, 要扣的錢,"現金")
-            await core.economy.update_bank(user,利息,"利息")
-            await core.economy.update_bank(user, 1,"利息等階")
-            NEW_users = await core.economy.get_bank_data(user)
-            NEW_利息 = int(NEW_users[5])
-            利息等階_data = await core.economy.利息_data(利息等階)
-            利息等階圖示 = 利息等階_data[0]
-            利息等階名稱 = 利息等階_data[1]
-            await ctx.send(f"你已晉升至{利息等階圖示}**{利息等階名稱}**。你的銀行利息變更為{round(NEW_利息-1, 3)*100}%/每2小時。")
-            webhook.delete(embed_)   
+            await ctx.send("才五等給妳升而已，是在懶甚麼")
             return
           else:
               await ctx.send("請輸入`Cup 信用卡 [all / max]`")
