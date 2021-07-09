@@ -256,10 +256,10 @@ class Mongo(Cog_Extension):
             利息 = regi1[5]
             new_銀行等階 = int(regi1[6])  
             利息等階 = int(regi1[7]) 
-            利息_data = await core.economy(利息等階)
+            利息_data = await core.economy.利息_data(利息等階)
             利息等階圖示 = 利息_data[0]
             利息等階名稱 = 利息_data[1]
-            存額_data = await core.economy(new_銀行等階)
+            存額_data = await core.economy.存額_data(new_銀行等階)
             new_銀行等階圖示 = 存額_data[0]
             銀行等階名稱 = 存額_data[1]
             
