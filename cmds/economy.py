@@ -485,7 +485,7 @@ class Mongo(Cog_Extension):
       if mode.lower() == "信用卡":
         if amount is not None:
           if amount.lower() == "all" or amount.lower() == "max":          
-            await ctx.send("才五等給妳升而已，是在懶甚麼")
+            await ctx.send("才五等給妳升而已，一級一級慢慢升啦~~其實是我不想寫~~")
             return
           else:
               await ctx.send("請輸入`Cup 信用卡 [all / max]`")
