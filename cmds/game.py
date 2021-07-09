@@ -277,7 +277,7 @@ class Game(Cog_Extension):
                 await ctx.send("**平手！:ribbon:**")
             elif check_win(str(reaction.emoji), bot_emoji):
                 await ctx.send("**你贏了 :sparkles:**你獲得了10,000,000！")
-                await core.economy(ctx.author,10000000)
+                await core.economy.update_bank(ctx.author,10000000)
             else:
                 await ctx.send("**我贏了 :robot:**")
 

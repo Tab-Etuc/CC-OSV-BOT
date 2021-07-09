@@ -365,83 +365,29 @@ class Mongo(Cog_Extension):
       if mode == "存額":
           if amount is not None:
             if amount.lower() == "all" or amount.lower() == "max":
-              所有的_users = await core.economy.get_bank_data(user)
-              所有的_存款額度 = int(所有的_users[4])
-              所有的_銀行等階 = int(所有的_users[6])
-              所有的_現金 = int(所有的_users[0])
-              if 所有的_銀行等階 <= 100:
-                    new_amt_存款額度 = (所有的_銀行等階 **2 * 100000) - 所有的_存款額度
-              elif 所有的_銀行等階 <= 1000:
-                    new_amt_存款額度 = (所有的_銀行等階 **2 * 10000) - 所有的_存款額度
-              elif 所有的_銀行等階 < 10000:
-                    new_amt_存款額度 = (所有的_銀行等階 **2 * 5000) - 所有的_存款額度
-              elif 所有的_銀行等階 >= 10000:
-                    new_amt_存款額度 = (所有的_銀行等階 **2 * 1000) - 所有的_存款額度
-              if 所有的_銀行等階 <= 100:
-                    扣比 = -0.95
-              elif 所有的_銀行等階 <= 500:
-                    扣比 = -0.85 
-              elif 所有的_銀行等階 <= 750:
-                    扣比 = -0.75                
-              elif 所有的_銀行等階 <= 1000:
-                    扣比 = -0.55
-              elif 所有的_銀行等階 <= 2000:
-                    扣比 = -0.45            
-              elif 所有的_銀行等階 <= 4000:
-                    扣比 = -0.40                
-              elif 所有的_銀行等階 <= 10000:
-                    扣比 = -0.35
-              elif 所有的_銀行等階 > 10000:
-                    扣比 = -0.15
-              要扣的錢 = new_amt_存款額度 * 扣比
-              data = 0
-              print('3')
-              if -1*要扣的錢 == 所有的_現金+要扣的錢:
-                data+=1
-              if -1*要扣的錢 < 所有的_現金:
-                data += 1
-              elif -1*要扣的錢 > 所有的_現金+要扣的錢:
-                if data != 1:
+              users = await core.economy.get_bank_data(user)
+              存款額度 = int(users[4])
+              銀行等階 = int(users[6])
+              現金 = int(users[0])
+              要扣的錢 = 存款額度*-0.8
+              if 現金+要扣的錢 >= 0:
                   await ctx.send(f"你的現金不足{round(-1*要扣的錢)}，這將使你無法提升任何一銀行等階。\n你可以使用`Cwith {round(-1*要扣的錢)}`將現金從銀行取出。")  
                   webhook.delete(embed_)   
                   return  
-              真_要扣的錢 = 0
-              所有的_現金 += 要扣的錢
-              while 所有的_現金+要扣的錢 > 要扣的錢 and 所有的_現金+要扣的錢 >= 0:
-                  
-                  所有的_銀行等階 += 1
-                  if 所有的_銀行等階 <= 100:
-                    new_amt_存款額度 = (所有的_銀行等階 **2 * 100000) - 所有的_存款額度
-                  elif 所有的_銀行等階 <= 1000:
-                    new_amt_存款額度 = (所有的_銀行等階 **2 * 10000) - 所有的_存款額度
-                  elif 所有的_銀行等階 < 10000:
-                    new_amt_存款額度 = (所有的_銀行等階 **2 * 5000) - 所有的_存款額度
-                  elif 所有的_銀行等階 >= 10000:
-                    new_amt_存款額度 = (所有的_銀行等階 **2 * 1000) - 所有的_存款額度
-                  if 所有的_銀行等階 <= 100:
-                    扣比 = -0.95
-                  elif 所有的_銀行等階 <= 500:
-                    扣比 = -0.85 
-                  elif 所有的_銀行等階 <= 750:
-                    扣比 = -0.75                
-                  elif 所有的_銀行等階 <= 1000:
-                    扣比 = -0.55
-                  elif 所有的_銀行等階 <= 2000:
-                    扣比 = -0.45            
-                  elif 所有的_銀行等階 <= 4000:
-                    扣比 = -0.40                
-                  elif 所有的_銀行等階 <= 10000:
-                    扣比 = -0.35
-                  elif 所有的_銀行等階 > 10000:
-                    扣比 = -0.15
-                  扣錢 = new_amt_存款額度 * 扣比
-                  所有的_現金 += 扣錢
-                  真_要扣的錢 += new_amt_存款額度 * 扣比
+              真_要扣的錢 = 要扣的錢
+              現金 += 要扣的錢
+              
+              while 現金+要扣的錢 > 要扣的錢 and 現金+要扣的錢 >= 0:
+                  銀行等階 += 1
+                  扣錢 = 存款額度 * -0.8
+                  存款額度 += 存款額度*1.2
+                  現金 += 扣錢
+                  真_要扣的錢 += 扣錢
 
-
+              存款額度 -= int(users[4])
               await core.economy.update_bank(user, 真_要扣的錢,"現金")
-              await core.economy.update_bank(user, new_amt_存款額度 ,"存款額度")
-              await core.economy.update_bank(user, 所有的_銀行等階,"銀行等階")
+              await core.economy.update_bank(user, 存款額度 ,"存款額度")
+              await core.economy.update_bank(user, 銀行等階,"銀行等階")
               NEW_users = await core.economy.get_bank_data(user)
               NEW_存款額度 = int(NEW_users[4])
               new_銀行等階 = int(NEW_users[6])   
@@ -456,54 +402,24 @@ class Mongo(Cog_Extension):
               webhook.delete(embed_)   
           else:
               users = await core.economy.get_bank_data(user)
-              一等_存款額度 = int(users[4])
-              一等_銀行等階 = int(users[6])
-              一等_現金 = int(users[0])
-              if 一等_銀行等階 <= 100:
-                    new_amt_存款額度 = (一等_銀行等階 **2 * 100000) - 一等_存款額度               
-              elif 一等_銀行等階 <= 1000:
-                    new_amt_存款額度 = (一等_銀行等階 **2 * 10000) - 一等_存款額度
-              elif 一等_銀行等階 < 10000:
-                    new_amt_存款額度 = (一等_銀行等階 **2 * 5000) - 一等_存款額度
-              elif 一等_銀行等階 >= 10000:
-                    new_amt_存款額度 = (一等_銀行等階 **2 * 1000) - 一等_存款額度
-              if 一等_銀行等階 <= 100:
-                扣比 = -0.95
-              elif 一等_銀行等階 <= 500:
-                扣比 = -0.85 
-              elif 一等_銀行等階 <= 750:
-                扣比 = -0.75                
-              elif 一等_銀行等階 <= 1000:
-                扣比 = -0.55
-              elif 一等_銀行等階 <= 2000:
-                扣比 = -0.45            
-              elif 一等_銀行等階 <= 4000:
-                扣比 = -0.40                
-              elif 一等_銀行等階 <= 10000:
-                扣比 = -0.35
-              elif 一等_銀行等階 > 10000:
-                扣比 = -0.15
-              一等_要扣的錢 = new_amt_存款額度 * 扣比
-              new_銀行等階 =  一等_銀行等階 + 1
-              data = 0
-              if -1*一等_要扣的錢 == 一等_現金:
-                  data += 1
-              if -1*一等_要扣的錢 < 一等_現金:
-                  data += 1
-              elif -1*一等_要扣的錢 > 一等_現金+一等_要扣的錢 :
-                if data != 1:
-                  await ctx.send(f"你的現金不足{round(-1*一等_要扣的錢)}，你可以使用`Cwith {round(-1*一等_要扣的錢)}`將現金從銀行取出。")    
+              存款額度 = int(users[4])
+              銀行等階 = int(users[6])
+              現金 = int(users[0])
+              要扣的錢 = 存款額度*-0.8
+              new_存款額度 = 存款額度*1.2 - 存款額度
+              if 現金+要扣的錢 >= 0:
+                  await ctx.send(f"你的現金不足{round(-1*要扣的錢)}，你可以使用`Cwith {round(-1*要扣的錢)}`將現金從銀行取出。")    
                   webhook.delete(embed_)   
                   return    
-              存額等階_data = await core.economy.存額_data(new_銀行等階)
+              存額等階_data = await core.economy.存額_data(銀行等階)
               new_銀行等階圖示 = 存額等階_data[0]           
                           
 
-              await core.economy.update_bank(user, 一等_要扣的錢,"現金")
-              await core.economy.update_bank(user, new_amt_存款額度 ,"存款額度")
+              await core.economy.update_bank(user, 要扣的錢,"現金")
+              await core.economy.update_bank(user, new_存款額度 ,"存款額度")
               await core.economy.update_bank(user, 1,"銀行等階")
 
-              await ctx.send(f"{new_銀行等階圖示}：你的存款上限已上升**{new_amt_存款額度}**至**{new_amt_存款額度 + 一等_存款額度}**。")
+              await ctx.send(f"{new_銀行等階圖示}：你的存款上限已上升**{new_存款額度}**至**{new_存款額度 + 存款額度}**。")
               webhook.delete(embed_)   
               return
       if mode.lower() == "信用卡":
@@ -520,7 +436,7 @@ class Mongo(Cog_Extension):
           利息等階 = int(users[7]) 
           利息= round(0.1, 1)
           NEW_利息 = int(users[5])
-          要扣的錢 = (利息等階 ** 2 *500000)*-1*0.55
+          要扣的錢 = (利息等階 ** 2 *500000)*-1
           data = 0
           if -1*要扣的錢 == 現金+要扣的錢:
                 data += 1
