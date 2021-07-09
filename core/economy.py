@@ -4,8 +4,7 @@ from pymongo import MongoClient
 import requests
 from config import *
 
-mainshop = [{"name":"Card","price":3000,"description":"c"},
-            {"name":"LuckyClover","price":77777,"description":"Work"},
+mainshop = [{"name":"LuckyClover","price":77777,"description":"Work"},
             {"name":"NTD","price":100000000000000000000,"description":"Gaming"},
             {"name":"watch","price":200000,"description":"Sports Car"},
             {"name":"NameColor","price":2000000,"description":"Sports Car"},
