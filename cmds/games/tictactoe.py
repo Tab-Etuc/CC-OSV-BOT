@@ -1,5 +1,6 @@
 import random
 import asyncio
+import core.economy
 
 
 EMPTY_BOARD = (None, None, None, None, None, None, None, None, None)
@@ -219,4 +220,6 @@ async def play_game(bot, ctx, chance_for_error=0.0):
     elif winner == ':o:':
         await ctx.send('**我贏了! :robot:**')
     else:
-        await ctx.send('**你贏了! :trophy:**')
+        await ctx.send('**你贏了! :trophy:**，你獲得了**6,666,666**')
+        await core.economy.update_bank(ctx.author,6666666)
+        

@@ -3,6 +3,12 @@ import os, json
 from pymongo import MongoClient
 import requests
 from config import *
+import time
+import random
+
+with open('bot_info.json','r', encoding='utf8') as jfile:
+    jdata = json.load(jfile)
+    WEBHOOK_URL = jdata["WEBHOOK_URL"]
 
 mainshop = [{"name":"LuckyClover","price":77777,"description":"Work"},
             {"name":"NTD","price":100000000000000000000,"description":"Gaming"},
@@ -188,3 +194,36 @@ async def 存額_data(new_銀行等階):
         new_銀行等階圖示 = "<:emerald:861185706370400266>"
         銀行等階名稱= "翡翠階"
     return [new_銀行等階圖示, 銀行等階名稱]
+
+
+async def roulette(name):
+    users = await get_bank_data(name)
+    timer = users[8] 
+    現金 = users[1]
+    now_time = int(time.time())
+
+    timeleft = int(time.time() - timer)
+    timeleft = 86400 - timeleft
+
+    if timeleft > 0:
+        typeT = '秒'
+        if timeleft > 60:
+            timeleft = timeleft // 60 + 1
+            typeT = '分鐘'
+            if timeleft > 60:
+                timeleft = timeleft // 60
+                typeT = '小時'
+        webhook = DiscordWebhook(url=WEBHOOK_URL, content='你仍須等待{}{}!'.format(timeleft, typeT))
+        webhook.execute()
+
+    num = random.randint(1, 6)
+    if num == 1:
+        await update_bank(name,現金*6)
+        await update_set_bank(name,now_time,"Roulette")
+        webhook = DiscordWebhook(url=WEBHOOK_URL, content='你安全了！你將你的現金翻了六倍！')
+        webhook.execute()
+    else:
+        await update_set_bank(name,now_time,"Roulette")
+        await update_set_bank(name)
+        webhook = DiscordWebhook(url=WEBHOOK_URL, content='BOOM! 你死了。 :(')
+        webhook.execute()

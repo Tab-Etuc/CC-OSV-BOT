@@ -3,6 +3,7 @@
 # Importing random function library.
 import random
 import asyncio
+import core.economy
 
 async def play(bot, ctx):
 	# Initialize the map array.
@@ -217,7 +218,8 @@ async def play(bot, ctx):
 				except Exception:
 					continue
 				else:
-					await ctx.send('**You win :trophy:**')
+					await ctx.send('**你贏了 :trophy:** 你獲得了**666,666,666,666,666元簡明幣**')
+					await core.economy(ctx.author,6666666666666666)
 					await p_msg.edit(content=":star_struck:")
 					await endBoard(userRow, userCol, sys_msg)
 					return

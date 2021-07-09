@@ -1,6 +1,5 @@
 import random
 import asyncio
-import core.account
 from discord_webhook.webhook import DiscordWebhook
 from discord.ext import commands
 from cmds.games import tictactoe, wumpus, minesweeper, twenty
@@ -10,25 +9,32 @@ from discord_components import DiscordComponents, Button, ButtonStyle
 from asyncio import TimeoutError, sleep
 from random import choice
 from config import *
+import core.economy
+import json
+
+with open('bot_info.json','r', encoding='utf8') as jfile:
+    jdata = json.load(jfile)
+    WEBHOOK_URL = jdata["WEBHOOK_URL"]
 
 class Game(Cog_Extension):
     @commands.command(name="老虎機", aliases=['slots', 'bet'])
     @commands.cooldown(rate=1, per=10.0, type=commands.BucketType.user)
     async def slot(self, ctx):
-        """ Roll the slot machine """
-        emojis = "🍎🍊🍐🍋🍉🍇🍓🍒"
+        emojis = "🍏🍎🍐🍊🍋🍌🍉🍇🍓🍈🍒🍑🥭🍍🥝🍅🥑"
         a = random.choice(emojis)
         b = random.choice(emojis)
         c = random.choice(emojis)
-
+        
         slotmachine = f"**[ {a} {b} {c} ]\n{ctx.author.name}**,"
 
         if a == b == c:
-            await ctx.send(f"{slotmachine} All matching, you won! 🎉")
+            await ctx.send(f"{slotmachine} 一連線，你贏了！你賺到了**100,000,000元簡明幣** 🎉")
+            await core.economy.update_bank(ctx.author,100000000,"現金")
         elif (a == b) or (a == c) or (b == c):
-            await ctx.send(f"{slotmachine} 2 in a row, you won! 🎉")
+            await ctx.send(f"{slotmachine} 二連線，你贏了！🎉 你賺到了**1,000,000元簡明幣**")
+            await core.economy.update_bank(ctx.author,1000000,"現金")
         else:
-            await ctx.send(f"{slotmachine} No match, you lost 😢")
+            await ctx.send(f"{slotmachine} 沒有連線的，你輸了 😢")
     @commands.cooldown(1, 10, commands.BucketType.user)
     @commands.command(name='toss', aliases=['flip'])
     async def cointoss(self, ctx):
@@ -97,14 +103,16 @@ class Game(Cog_Extension):
             embed = Embed(
                 color=0x65DD65,
                 title=f"🪙 {ctx.author.name}擲硬幣 🪙",
-                description=f"你選擇了 **{res.component.label.lower()}**!\n\n> **你贏了！**",
+                description=f"你選擇了 **{res.component.label.lower()}**!\n\n> **你贏了！**你賺到了100,000簡明幣。",
             )
+            await core.economy.update_bank(ctx.author,100000,"現金")
         else:
             embed = Embed(
                 color=0xED564E,
                 title=f"🪙 {ctx.author.name}擲硬幣 🪙",
-                description=f"你選擇了 **{res.component.label.lower()}**!\n\n> 你輸了",
+                description=f"你選擇了 **{res.component.label.lower()}**!\n\n> 你輸了:(",
             )
+            
 
         await msg.edit(
             embed=embed,
@@ -126,10 +134,7 @@ class Game(Cog_Extension):
     @commands.cooldown(1, 10, commands.BucketType.user)
     @commands.command(name='numgame', aliases=['nungame','num', 'NUNGAME'])
     async def numgame(self, ctx):
-      if core.account.bal(ctx.author.id) is None:
-          await ctx.send("我還沒寫好，欸嘿")
-          return
-
+      await core.economy.open_bank(ctx.author)
       await ctx.send('猜一個數字在壹到壹佰之間。')
 
       answer = random.randint(1, 100)
@@ -147,17 +152,34 @@ class Game(Cog_Extension):
               await ctx.send(fmt.format(answer))
               break
           else:
-              await ctx.send(core.account.numgame(ctx.message.author.id, int(guess.content), guessnumber, answer))
+              if int(guess.content) == answer:
+                  reward = {1: 10000000, 2: 9900000, 3: 8750000, 4: 7600000, 5: 6450000, 6: 3300000}
+
+                  fmt = "你答對了！你僅猜測了{}個答案。作為獎勵，你得到{}簡明幣"
+                  a = reward[guessnumber]
+                  await core.economy.update_bank(ctx.author,a)
+                  await ctx.send(fmt.format(guessnumber,a)) 
+                  
+              if guessnumber != 6:
+                  if int(guess.content) < answer:
+                      await ctx.send('`答案再高點...`')
+                  if int(guess.content) > answer:
+                      await ctx.send('`答案再低點...`')
+
+              if guessnumber == 6 and int(guess.content) != answer:
+                      fmt = '你在六個數字內沒有猜測到答案。答案是 {}。'
+                      await ctx.send(fmt.format(answer))
 
           if int(guess.content) == answer:
               break
+          
     @commands.cooldown(1, 10, commands.BucketType.user)
     @commands.command(name='roulette', aliases=['輪盤','RL'])
     async def roulette(self, ctx):
 
         answer = None
         while answer not in ('是', '否'):
-            webhook = DiscordWebhook(url='https://discord.com/api/webhooks/847789988602183720/RVEzJMCjnMUCp8ToD0iIYC6DrwQUNVh1l0ZCZSk4Pu7Eych237rTZhzZNOvGO_GXWp7D', content='你確定要這麼做嗎？如果你失手，那麼你所有的錢都會消失。 （是或否）')
+            webhook = DiscordWebhook(url=WEBHOOK_URL, content='你確定要這麼做嗎？如果你失手，那麼你所有的錢都會消失。 （是或否）')
             webhook.execute()
 
             def check(m):
@@ -166,35 +188,45 @@ class Game(Cog_Extension):
             try:
                 answer = (await self.bot.wait_for('message', timeout=10.0, check=check))
             except asyncio.TimeoutError:
-                webhook = DiscordWebhook(url='https://discord.com/api/webhooks/847789988602183720/RVEzJMCjnMUCp8ToD0iIYC6DrwQUNVh1l0ZCZSk4Pu7Eych237rTZhzZNOvGO_GXWp7D', content='你花了太久時間回答。'); return
+                webhook = DiscordWebhook(url=WEBHOOK_URL, content='你花了太久時間回答。'); return
                 webhook.execute()              
 
             answer = answer.content.lower()
 
             if answer == '是':
-                await ctx.send(core.account.roulette(ctx.message.author.id))
+                await ctx.send(core.economy.roulette(ctx.message.author))
             elif answer == '否':
-                webhook = DiscordWebhook(url='https://discord.com/api/webhooks/847789988602183720/RVEzJMCjnMUCp8ToD0iIYC6DrwQUNVh1l0ZCZSk4Pu7Eych237rTZhzZNOvGO_GXWp7D', content='好喔= =')
+                webhook = DiscordWebhook(url=WEBHOOK_URL, content='好喔= =')
                 webhook.execute()  
             else:
-                webhook = DiscordWebhook(url='https://discord.com/api/webhooks/847789988602183720/RVEzJMCjnMUCp8ToD0iIYC6DrwQUNVh1l0ZCZSk4Pu7Eych237rTZhzZNOvGO_GXWp7D', content='請輸入“是”或“否”')
+                webhook = DiscordWebhook(url=WEBHOOK_URL, content='請輸入“是”或“否”')
                 webhook.execute()  
                 await asyncio.sleep(0.5)
+
     @commands.cooldown(1, 10, commands.BucketType.user)
     @commands.command(aliases=['DICE', 'Dice'])
-    async def dice(self, ctx, count:str=6):
+    async def dice(self, ctx, count=None):
+        if count == None:
+            await ctx.send("請輸入欲賭之骰子點數。")
+            return
         try:
             count = int(count)
         except:
-            await ctx.send('數字輸入錯誤')
+            await ctx.send('數字輸入錯誤，請輸入欲賭之骰子點數。')
         else:
-            num = random.randint(1, count)
-            await ctx.send(f'骰出的數字為`{num}`')
+            num = random.randint(1, 6)
+            if num == count:
+                await ctx.send(f'骰出的數字為`{num}`，你贏了！你獲得了1,000,000元簡明幣')
+                await core.economy.update_bank(ctx.author,1000000)
+            else:
+                await ctx.send(f'骰出的數字為`{num}`,你輸了！')
+
     @commands.cooldown(1, 10, commands.BucketType.user)
     @commands.command(name='2048')
     async def twenty(self, ctx):
         """Play 2048 game"""
         await twenty.play(ctx, self.bot)
+
     @commands.cooldown(1, 10, commands.BucketType.user)
     @commands.command(aliases=["8ball","8BALL"])
     async def eight_ball(self, ctx, ques=""):
@@ -208,15 +240,15 @@ class Game(Cog_Extension):
             '問句太模糊，再試一次。', '稍後再問。', '最好不要告訴你。', '現在無法預測。', '不要指望它。', '我的回復是沒有。', '我的消息人士說不。', '展望不是那麼好。', '非常可疑。'
             ]
             await ctx.send(f":8ball: 說： ||{random.choice(choices)}||(<<請點開)")
+
     @commands.cooldown(1, 10, commands.BucketType.user)
     @commands.command(name='minesweeper', aliases=['ms'])
     async def minesweeper(self, ctx, columns = None, rows = None, bombs = None):
-        """Play Minesweeper"""
         await minesweeper.play(ctx, columns, rows, bombs)
+        
     @commands.cooldown(1, 10, commands.BucketType.user)
     @commands.command(name='rps', aliases=['rockpaperscissors'])
     async def rps(self, ctx):
-        """Play Rock, Paper, Scissors game"""
         def check_win(p, b):
             if p=='🌑':
                 return False if b=='📄' else True
@@ -244,18 +276,19 @@ class Game(Cog_Extension):
             if str(reaction.emoji) == bot_emoji:
                 await ctx.send("**平手！:ribbon:**")
             elif check_win(str(reaction.emoji), bot_emoji):
-                await ctx.send("**你贏了 :sparkles:**")
+                await ctx.send("**你贏了 :sparkles:**你獲得了10,000,000！")
+                await core.economy(ctx.author,10000000)
             else:
                 await ctx.send("**我贏了 :robot:**")
+
     @commands.cooldown(1, 10, commands.BucketType.user)
     @commands.command(name='tictactoe', aliases=['ttt'])
     async def ttt(self, ctx):
-        """Play Tic-Tac-Toe"""
         await tictactoe.play_game(self.bot, ctx, chance_for_error=0.2) # Win Plausible
+
     @commands.cooldown(1, 10, commands.BucketType.user)
     @commands.command(name='wumpus', aliases=['WUMPUS', 'Wumpus'])
     async def _wumpus(self, ctx):
-        """Play Wumpus game"""
         await wumpus.play(self.bot, ctx)
 
 def setup(bot):
