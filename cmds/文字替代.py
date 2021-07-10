@@ -11,10 +11,9 @@ class 文字替代(Cog_Extension):
             if emoji.animated:
                 add = "a"
                 emojiID = emoji.id
+                return f"<{add}:{emoji.name}:{emojiID}>"
             else:
-                add = ""
-                emojiID = ""
-            return f"<{add}:{emoji.name}:{emojiID}>"
+                return f":{emoji.name}:"
         else:
             return None
 
@@ -35,7 +34,7 @@ class 文字替代(Cog_Extension):
                         for i in item:
                             if cnt == 2:
                                 aaa = wr.replace(" ", "")
-                                ret.append(aaa)
+                                ret.append(aaa) 
                                 wr = ""
                                 cnt = 0
                             if i != ":":

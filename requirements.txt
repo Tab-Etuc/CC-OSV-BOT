@@ -7,12 +7,10 @@ config~=0.5.0
 pymongo~=3.11.3
 dnspython
 disputils~=0.2.0
-vacefron.py
 psutil~=5.8.0
 python-dotenv~=0.17.0
 flask~=2.0.1
 timeago ~=1.0.15
 requests ~=2.25.1
 PyNaCl
-pandas
 Pillow
