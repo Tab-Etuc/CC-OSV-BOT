@@ -407,7 +407,7 @@ class Mongo(Cog_Extension):
               現金 = int(users[0])
               要扣的錢 = 存款額度*-0.8
               new_存款額度 = 存款額度*1.2 - 存款額度
-              if 現金+要扣的錢 >= 0:
+              if 現金+要扣的錢 < 0:
                   await ctx.send(f"你的現金不足{round(-1*要扣的錢)}，你可以使用`Cwith {round(-1*要扣的錢)}`將現金從銀行取出。")    
                   webhook.delete(embed_)   
                   return    
