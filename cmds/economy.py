@@ -374,7 +374,7 @@ class Mongo(Cog_Extension):
                   await ctx.send(f"你的現金不足{round(-1*要扣的錢)}，這將使你無法提升任何一銀行等階。\n你可以使用`Cwith {round(-1*要扣的錢)}`將現金從銀行取出。")  
                   webhook.delete(embed_)   
                   return  
-              真_要扣的錢 = 要扣的錢
+              真_要扣的錢 = 0
               現金 += 要扣的錢
               
               while 現金 >= 0:
