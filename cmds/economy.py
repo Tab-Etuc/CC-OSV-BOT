@@ -375,14 +375,14 @@ class Mongo(Cog_Extension):
                   webhook.delete(embed_)   
                   return  
               真_要扣的錢 = 0
-              現金 += 要扣的錢
+              現金 += 要扣的錢  
               
-              while 現金 >= 0:
+              while 現金+扣錢 >= 0:
                   銀行等階 += 1
-                  扣錢 = 存款額度 * -0.8
-                  存款額度 += 存款額度*1.2
-                  現金 += 扣錢
-                  真_要扣的錢 += 扣錢
+                  扣錢 = 存款額度 * -0.8   
+                  存款額度 += 存款額度*1.2  
+                  現金 += 扣錢  
+                  真_要扣的錢 += 扣錢 
 
               存款額度 -= int(users[4])
               await core.economy.update_bank(user, 真_要扣的錢,"現金")
