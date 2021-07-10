@@ -1,26 +1,20 @@
 import discord
 from discord import utils
 from discord.ext import commands
-from pymongo import MongoClient
-import os
+from core.classes import Cog_Extension
 
-conn = MongoClient(os.getenv("MONGODB_URI"))
-db = conn["CC-OSV-NQN"]
-
-nqn = db["nqn"]
-
-class CL3I(commands.Cog):
-    def __init__(self, client):
-        self.client = client
+class 文字替代(Cog_Extension):
     async def getemote(self, arg):
-        emoji = utils.get(self.client.emojis, name=arg.strip(":"))
+        emoji = utils.get(self.bot.emojis, name=arg.strip(":"))
 
         if emoji is not None:
             if emoji.animated:
                 add = "a"
+                emojiID = emoji.id
             else:
                 add = ""
-            return f"<{add}:{emoji.name}:{emoji.id}>"
+                emojiID = ""
+            return f"<{add}:{emoji.name}:{emojiID}>"
         else:
             return None
 
@@ -99,9 +93,6 @@ class CL3I(commands.Cog):
                 await webhook.send(ret, username = message.author.nick, avatar_url = message.author.avatar_url, allowed_mentions=discord.AllowedMentions(everyone=False, users=False, roles=False, replied_user=False))                  
                 await message.delete() 
                 await webhook.delete()
-        kek = nqn.find_one({"_id": message.guild.id})
-        if kek == None:
-            return
 
         if ":" in message.content:
             msg = await self.getinstr(message.content)
@@ -135,5 +126,5 @@ class CL3I(commands.Cog):
 
   
 
-def setup(client):
-    client.add_cog(CL3I(client))
+def setup(bot):
+    bot.add_cog(文字替代(bot))

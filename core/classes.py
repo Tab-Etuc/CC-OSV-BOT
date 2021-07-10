@@ -39,13 +39,6 @@ class Global_Func():
         with open('CCbot.json', 'w', encoding='utf8') as jfile:
             json.dump(jdata, jfile, indent=4, ensure_ascii=False)
     
-    
-    #CodeBlock
-    @classmethod
-    def code(cls, lang, msg):
-        '''CodeBlock'''
-        return f'```{lang}\n{msg}\n```'
-
 
 class Logger:
     def log(self, ctx, data, type='error'):

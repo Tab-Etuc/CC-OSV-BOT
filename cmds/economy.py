@@ -1,6 +1,6 @@
 import discord
 from discord.ext import commands
-import os, json, random
+import os, random
 from pymongo import MongoClient
 from core.classes import Cog_Extension
 import core.economy
@@ -9,10 +9,6 @@ import time, datetime
 from config import *
 
 auth_url = os.getenv("MONGODB_URI")
-
-with open('bot_info.json','r', encoding='utf8') as jfile:
-    jdata = json.load(jfile)
-    WEBHOOK_URL = jdata["WEBHOOK_URL"]
 
 class Mongo(Cog_Extension):  
 
@@ -37,9 +33,9 @@ class Mongo(Cog_Extension):
       index = 1
       cluster = MongoClient(auth_url)
       db = cluster["Economy"]
-
       cursor = db["Bank"]
       mydoc = cursor.find().sort("銀行餘額",-1)
+      
       for member in mydoc:
         if index > 8:
             break
