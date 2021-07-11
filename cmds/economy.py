@@ -88,7 +88,7 @@ class Mongo(Cog_Extension):
           name = item["item"]
           amount = item["amount"]
 
-          embed.add_field(name = name, value = amount)    
+          embed.add_embed_field(name = name, value = amount)    
       webhook.add_embed(embed)
       webhook.execute(embed)
 
