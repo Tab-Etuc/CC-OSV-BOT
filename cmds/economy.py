@@ -205,27 +205,42 @@ class Mongo(Cog_Extension):
         webhook = DiscordWebhook(url=WEBHOOK_URL)
         embed_ = await core.economy.loading()
         user = ctx.author 
+        user1 = user
         await core.economy.open_bank(user)
                                         
-        users = await core.economy.get_bank_data(user)
         if (regi is not None and regi.bot) or ctx.author.bot:
             webhook.delete(embed_)
-            webhook = DiscordWebhook(url=WEBHOOK_URL, content=f'{ctx.author.mention} 該用戶是一個BOT，不能擁有一個帳戶')
+            webhook = DiscordWebhook(url=WEBHOOK_URL, content=f'{ctx.author.mention}該用戶是一個BOT，不能擁有一個帳戶')
             webhook.execute(); return
         elif not regi:
+                avatar_url = str(user1.avatar_url)
                 users = await core.economy.get_bank_data(user)
-                利息等階_data = await core.economy.利息_data(int(users[7]))
-                存額等階_data = await core.economy.存額_data(int(users[6])  )
+                wallet_amt = int(users[0])
+                bank_amt = int(users[1])
+                bank_lv = int(users[4])
+                薪資 = int(users[3])
+                利息 = users[5]
+                new_銀行等階 = int(users[6])   
+                利息等階 = int(users[7]) 
+                利息等階_data = await core.economy.利息_data(利息等階)
+                利息等階圖示 = 利息等階_data[0]
+                利息等階名稱 = 利息等階_data[1]
+
+                存額等階_data = await core.economy.存額_data(new_銀行等階)
+                new_銀行等階圖示 = 存額等階_data[0]
+                銀行等階名稱 = 存額等階_data[1]
 
                 embed = DiscordEmbed(title="一般用戶".format(user.name), color=MAIN_COLOR)
-                embed.set_author(name=f"{user.name}的個人簡介", icon_url=user.avatar_url)
-                embed.add_embed_field(name="金錢", value=f" \n 薪資： **{int(users[3])}** \n\n現金餘額：**{int(users[0])}**    \n銀行餘額：**{int(users[1])}**", inline=False)
-                embed.add_embed_field(name="銀行存款等階：", value=f"[ {利息等階_data[0]} ] {利息等階_data[1]} \n [等級：**{存額等階_data[0]}** ] \n 銀行存款額度：{int(users[4])}", inline=True)
-                embed.add_embed_field(name="銀行會員等階", value=f"[ {利息等階_data[0]} ] {利息等階_data[1]} \n [等級：**{int(users[7])}** ] \n利息：**{round(users[5], 2)}**", inline=True)
+                embed.set_author(name="{}的個人簡介".format(user.name), icon_url=avatar_url)
+
+                embed.add_embed_field(name="金錢", value=" \n 薪資： **{}** \n\n現金餘額：**{}**    \n銀行餘額：**{}**".format(薪資,wallet_amt, bank_amt), inline=False)
+                embed.add_embed_field(name="銀行存款等階：", value="[ {} ] {} \n [等級：**{}** ] \n 銀行存款額度：{}".format(new_銀行等階圖示,銀行等階名稱,new_銀行等階,bank_lv), inline=True)
+                embed.add_embed_field(name="銀行會員等階", value=f"[ {利息等階圖示} ] {利息等階名稱} \n [等級：**{利息等階}** ] \n利息：**{round(利息, 2)}**", inline=True)
                 embed.add_embed_field(name="一般", value=f"暱稱：`{user.nick}` \n帳號創建於：`{user.created_at.__format__('%Y年%m月%d日 %H:%M:%S')}` \n加入時間：`{user.joined_at.__format__('%Y年%m月%d日 %H:%M:%S')}` ", inline=False)
                 webhook.add_embed(embed)
                 webhook.delete(embed_)
                 webhook.execute(); return
+    
         elif regi is not None:
             regi1 = await core.economy.get_bank_data(regi)
             wallet_amt = int(regi1[0])
@@ -235,16 +250,16 @@ class Mongo(Cog_Extension):
             利息 = regi1[5]
             new_銀行等階 = int(regi1[6])  
             利息等階 = int(regi1[7]) 
-            利息_data = await core.economy.利息_data(利息等階)
+            利息_data = await core.economy(利息等階)
             利息等階圖示 = 利息_data[0]
             利息等階名稱 = 利息_data[1]
-            存額_data = await core.economy.存額_data(new_銀行等階)
+            存額_data = await core.economy(new_銀行等階)
             new_銀行等階圖示 = 存額_data[0]
             銀行等階名稱 = 存額_data[1]
             
             embed = DiscordEmbed(title="一般用戶".format(regi.name), color=MAIN_COLOR)
             embed.set_author(name="{}的個人簡介".format(regi.name))
-            embed.add_embed_field(name="金錢", value="\n 薪資： **{}** \n\n現金餘額：**{}**    \n銀行餘額：**{}**".format(薪資,int(regi1[0]), bank_amt), inline=False)
+            embed.add_embed_field(name="金錢", value="\n 薪資： **{}** \n\n現金餘額：**{}**    \n銀行餘額：**{}**".format(薪資,wallet_amt, bank_amt), inline=False)
             embed.add_embed_field(name="銀行存款等階：", value="[ {} ] {} \n [等級：{}] \n 銀行存款額度：{}".format(new_銀行等階圖示,銀行等階名稱,new_銀行等階,bank_lv), inline=True)
             embed.add_embed_field(name="銀行會員等階", value=f"[ {利息等階圖示} ] {利息等階名稱} \n [等級：**{利息等階}** ] \n利息：**{round(利息, 2)}**", inline=True)
             embed.add_embed_field(name="一般", value=f"暱稱：`{regi.nick}` \n帳號創建於：`{regi.created_at.__format__('%Y年%m月%d日 %H:%M:%S')}` \n加入時間：`{regi.joined_at.__format__('%Y年%m月%d日 %H:%M:%S')}` ", inline=False)
@@ -252,6 +267,7 @@ class Mongo(Cog_Extension):
             webhook.add_embed(embed)
             webhook.delete(embed_)
             webhook.execute(); return
+
 
     @commands.cooldown(1, 10, commands.BucketType.user)
     @commands.command(aliases=['pay'])
