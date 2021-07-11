@@ -23,7 +23,7 @@ class Main(Cog_Extension):
                 counter += 1
         await ctx.message.delete(tmp)
         embed = discord.Embed(clolor=MAIN_COLOR)
-        embed.add_field(name="成功計算！", value='你在{}則訊息中，發送了{}則訊息。這佔了其中{}%。'.format(counter2, counter, (counter * 100) // counter2))    )
+        embed.add_field(name="成功計算！", value='你在{}則訊息中，發送了{}則訊息。這佔了其中{}%。'.format(counter2, counter, (counter * 100) // counter2))    
         embed.set_footer(text=f'由{ctx.author}請求的指令✨')
         await ctx.send(embed=embed)
 
