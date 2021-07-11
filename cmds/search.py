@@ -4,7 +4,7 @@ from discord.ext import commands
 from core.classes import Cog_Extension
 from config import *
 
-with open(r'./settings/search.json', 'r', encoding='utf8') as SearchFile:
+with open(r'search.json', 'r', encoding='utf8') as SearchFile:
     SearchData = json.load(SearchFile)
 
 def Search(search_type, ctx, arg):

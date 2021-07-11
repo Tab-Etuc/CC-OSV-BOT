@@ -1,16 +1,32 @@
 import discord
 from discord.ext import commands
 from core.classes import Cog_Extension
-import datetime, json, psutil
+import datetime, psutil
 from config import *
 
-with open('bot_info.json','r', encoding='utf8') as jfile:
-    jdata = json.load(jfile) # 讀取設定檔
-
-with open(r'./settings/message_process.json', mode='r', encoding='utf8') as MessageFile:
-    MessageData = json.load(MessageFile)
-
 class Main(Cog_Extension):
+  @commands.cooldown(1, 10, commands.BucketType.user)
+  @commands.command(aliases=['WHO', 'Who'])
+  async def who(self, ctx):
+      '''說出你是誰'''
+      await ctx.send("你是**{}**！".format(ctx.message.author))
+
+  @commands.cooldown(1, 10, commands.BucketType.user)
+  @commands.command(aliases=['msg','MSG'])
+  async def messages(self, ctx):
+        tmp = await ctx.send('正在計算訊息...')
+        counter = 0
+        counter2 = 0
+        async for log in ctx.history(limit=100000):
+            counter2 += 1
+            if log.author == ctx.message.author:
+                counter += 1
+        await ctx.message.delete(tmp)
+        embed = discord.Embed(clolor=MAIN_COLOR)
+        embed.add_field(name="成功計算！", value='你在{}則訊息中，發送了{}則訊息。這佔了其中{}%。'.format(counter2, counter, (counter * 100) // counter2))    )
+        embed.set_footer(text=f'由{ctx.author}請求的指令✨')
+        await ctx.send(embed=embed)
+
   @commands.cooldown(1, 10, commands.BucketType.user)
   @commands.command(aliases=['python', 'botinfo','BOT'])
   async def bot(self, ctx):
@@ -41,6 +57,7 @@ class Main(Cog_Extension):
                           f'\n可用的 RAM 數 - {round(val4, 2)} GB')
 
         await ctx.send(embed=embedve)
+
   @commands.cooldown(1, 10, commands.BucketType.user)
   @commands.command(name='sinfo', aliases=['server'])
   async def serverinfo(self, ctx, *, name:str = ""):
@@ -74,7 +91,7 @@ class Main(Cog_Extension):
         # Create embed
         em = discord.Embed(color=0x00CC99)
         em.add_field(name='國名', value=f'`{server.name}`')
-        em.add_field(name='總統', value=f'`煞氣TM爺爺#5692`', inline=False)
+        em.add_field(name='總統', value=f'`桐生大學哲學碩士#6400`', inline=False)
         em.add_field(name='國民數', value=f'`{server.member_count-6}`')
         em.add_field(name='表情符號數', value=f'`60`')
         em.add_field(name='文字頻道數', value=f'`{tchannel_count}`')
@@ -89,15 +106,17 @@ class Main(Cog_Extension):
             await ctx.send(embed=em)
         except Exception:
             await ctx.send("I don't have permission to send embeds here :disappointed_relieved:")
+  
   @commands.cooldown(1, 10, commands.BucketType.user)
   @commands.command(aliases=['Ping', 'PING'])
   async def ping(self, ctx):
         ping=abs(int(self.bot.latency*1000))
         embed=discord.Embed(title=f'{ping}(ms)', color=0x73ff00, timestamp=datetime.datetime.now(datetime.timezone.utc))
         embed.set_author(name='延遲') 
-        embed.set_footer(text=f'由{ctx.author}請求的鏈接')
+        embed.set_footer(text=f'由{ctx.author}請求的指令✨')
         await ctx.send(embed=embed)
         print(f'【Bot】{ctx.author} take bot\'s ping')
+
   @commands.cooldown(1, 10, commands.BucketType.user)
   @commands.command(aliases=['NITRO', 'nitro'])
   async def Nitro(self, ctx, style:int=1):

@@ -1,7 +1,0 @@
-{
-    "encrypt":{
-        "list":[
-            "ASCII", "base45"
-        ]
-    }
-}

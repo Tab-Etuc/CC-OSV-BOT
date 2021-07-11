@@ -1,113 +1,32 @@
 from discord.ext import commands
 from core.classes import Cog_Extension, Gloable_Data
 from core.errors import Errors
-import json
 import discord
-import re
-
-'''
+from config import *
 import googletrans
+
 client = discord.Client()
 tr = googletrans.Translator()
 DEFAULT_LANGUAGE = "zh-tw"
-LOGGING = False	
-'''
-with open('bot_info.json', 'r', encoding='utf8') as jfile:
-   jdata = json.load(jfile)
 
 class Event(Cog_Extension):
-  '''
-  @commands.Cog.listener()
-  async def on_message(self, message):
-    try:
+  @commands.command()
+  @commands.cooldown(1, 10, commands.BucketType.user)
+  async def tr(self,ctx, *,message=None):
       if message.author == self.bot.user:
-        # Dont respond to own messages
+        return
+      if message is None:
+        await ctx.send("請輸入欲翻譯之文字。參見：`Ctr [文字]`")
         return
 
-      elif message.content == "[tr help]":
-        print("Reached")
-        # Help message
-        HELP_MESSAGE =  "Syntax: [tr]\n"
-        HELP_MESSAGE += "Arguments (optional): s (source language), d (destination language)\n\n"
-        HELP_MESSAGE += "Example: [tr s=en d=fr] I am hungry.\n"
-        HELP_MESSAGE += "Another Example: [tr] Tu es mon ami.\n\n"
-        HELP_MESSAGE += "[tr languages] for a list of languages and codes"
-        await message.reply(HELP_MESSAGE, mention_author=True)
+      srcArg = False			# True if source language was provided
+      dst = DEFAULT_LANGUAGE
 
-      elif message.content == "[tr languages]":
-        # List of languages
-        output = "code: language\n\n"
-        for key in googletrans.LANGUAGES:
-          output += key
-          output += ": "
-          output += googletrans.LANGUAGES.get(key).capitalize()
-          output += "\n"
-        await message.reply(output, mention_author=False)
+      # Generate translation, log message details, then send message
+      output = tr.translate(message, dest=dst)
 
-      elif (message.content.startswith('[tr ') and ']' in message.content) or message.content.startswith('[tr]'):
-        # Split message into command and text
-        end = message.content.index(']')
-        args = message.content[1: end]
-        text = message.content[end + 2:]
-
-        # Check if text is valid (non empty)
-        if text == None or text.isspace() or text == "":
-          emb = discord.Embed(title="Error", description='Please include a message to translate. Use [tr help] for help.', color=0x00ff00)
-          await message.reply(embed=emb, mention_author=False)
-          return
-
-        # Split command into arguments
-        args = re.split(" |=", args)
-        while "" in args: args.remove("")
-
-        srcArg = False			# True if source language was provided
-
-        # Check if source langauge given as argument, if not try to detect
-        try:
-          srcind = args.index("s")
-          src = args[srcind + 1]
-          srcArg = True
-        except ValueError:
-          src = tr.detect(text)
-          src = src.lang
-          if type(src) == list:
-            src = src[0]
-          src = src.lower()
-
-        # Check if destination language given as argument, if not set to DEFAULT_LANGUAGE
-        try:
-          dstind = args.index("d")
-          dst = args[dstind + 1]
-          dstArg = True
-        except ValueError:
-          dst = DEFAULT_LANGUAGE
-
-        # Check if source language is valid, if not send error
-        if src in googletrans.LANGUAGES:
-          srcLang = googletrans.LANGUAGES.get(src).capitalize()
-        else:
-          emb = discord.Embed(title="Error", description='Invalid Source Language.', color=0x00ff00)
-          await message.reply(embed=emb, mention_author=False)
-          return
-
-        # Check if destination language is invalid, if yes send error
-        if not dst in googletrans.LANGUAGES:
-          emb = discord.Embed(title="Error", description='Invalid Destination Language.', color=0x00ff00)
-          await message.reply(embed=emb, mention_author=False)
-          return
-
-        # Generate translation, log message details, then send message
-        output = tr.translate(text, src=src, dest=dst)
-        if LOGGING:
-          print(src, "|", dst, "|", text, "|", output.text)
-
-        emb = discord.Embed(title="Translated Text", description=output.text, color=0x00ff00)
-        if not srcArg: emb.add_field(name="Source Language", value=src, inline=False)
-        await message.reply(embed=emb, mention_author=False)
-    except discord.errors.Forbidden:
-      if LOGGING:
-        print("Bot missing permissions in", message.channel)
-  '''
+      emb = discord.Embed(title="翻譯文字", description=output.text, color=MAIN_COLOR)
+      await message.reply(embed=emb, mention_author=False)
 
   @commands.Cog.listener()
   async def on_command_error(self, ctx, error):
@@ -129,6 +48,26 @@ class Event(Cog_Extension):
               role = guild.get_role(837975201915994153)
               await data.member.add_roles(role)
               await data.member.send(f"你已獲得進入紅燈區之通行證。")
+          elif str(data.emoji) == '🌻':
+              guild = self.bot.get_guild(data.guild_id)
+              role = guild.get_role(863628692802240522)
+              await data.member.add_roles(role)
+              await data.member.send(f"你已獲得進入墓園之通行證。")
+          elif str(data.emoji) == '🆙':
+              guild = self.bot.get_guild(data.guild_id)
+              role = guild.get_role(863629520719839242)
+              await data.member.add_roles(role)
+              await data.member.send(f"你已獲得進入練等專區之通行證。")
+          elif str(data.emoji) == '🍔':
+              guild = self.bot.get_guild(data.guild_id)
+              role = guild.get_role(863630245630443551)
+              await data.member.add_roles(role)
+              await data.member.send(f"你已獲得進入晚餐揪揪群之通行證。")
+          elif str(data.emoji) == '<:diamond:861185706336845834>':
+              guild = self.bot.get_guild(data.guild_id)
+              role = guild.get_role(863639159461773322)
+              await data.member.add_roles(role)
+              await data.member.send(f"你已獲得進入CC-OSV待辦事項區之通行證。")                            
       elif data.message_id == 837963992982880266:
           if str(data.emoji) == '<:emoji_7:835137032300003348>': 
               guild = self.bot.get_guild(data.guild_id)
@@ -141,6 +80,11 @@ class Event(Cog_Extension):
               role = guild.get_role(837968327014875177)
               await data.member.add_roles(role)
               await data.member.send(f"你已獲大同國民黨黨籍。")
+          elif str(data.emoji) == '<a:y_star1:858132467890520064>': 
+              guild = self.bot.get_guild(data.guild_id)
+              role = guild.get_role(860396953551634432)
+              await data.member.add_roles(role)
+              await data.member.send(f"你已獲星曌黨黨籍。")            
       elif data.message_id == 847029838546993163:
         if str(data.emoji) == '<a:emoji2:847026711064346655>':
             guild = self.bot.get_guild(data.guild_id)
@@ -227,6 +171,30 @@ class Event(Cog_Extension):
                 role = guild.get_role(837975201915994153)
                 await user.remove_roles(role)
                 await user.send(f"你已被禁止進入紅燈區。")    
+          elif str(data.emoji) == '🌻':
+                guild = self.bot.get_guild(data.guild_id)
+                user = await guild.fetch_member(data.user_id)
+                role = guild.get_role(863628692802240522)
+                await user.remove_roles(role)
+                await user.send(f"你已被禁止進入墓園。")    
+          elif str(data.emoji) == '🆙':
+                guild = self.bot.get_guild(data.guild_id)
+                user = await guild.fetch_member(data.user_id)
+                role = guild.get_role(863629520719839242)
+                await user.remove_roles(role)
+                await user.send(f"你已被禁止進入練等專區。")    
+          elif str(data.emoji) == '🍔':
+                guild = self.bot.get_guild(data.guild_id)
+                user = await guild.fetch_member(data.user_id)
+                role = guild.get_role(863630245630443551)
+                await user.remove_roles(role)
+                await user.send(f"你已被禁止進入晚餐揪揪群。")    
+          elif str(data.emoji) == '<:diamond:861185706336845834>':
+                guild = self.bot.get_guild(data.guild_id)
+                user = await guild.fetch_member(data.user_id)
+                role = guild.get_role(863639159461773322)
+                await user.remove_roles(role)
+                await user.send(f"你已被禁止進入紅燈區。")                                                                    
       elif data.message_id == 837963992982880266:
         if str(data.emoji) == '<:emoji_7:835137032300003348>':
                 guild = self.bot.get_guild(data.guild_id)
@@ -241,6 +209,12 @@ class Event(Cog_Extension):
                 role = guild.get_role(837968327014875177)
                 await user.remove_roles(role)
                 await user.send(f"你已退黨。")
+            elif str(data.emoji) == '<:y_star1:858132467890520064>':
+                guild = self.bot.get_guild(data.guild_id)
+                user = await guild.fetch_member(data.user_id)
+                role = guild.get_role(860396953551634432)
+                await user.remove_roles(role)
+                await user.send(f"你已退黨。")                
       elif data.message_id == 847029838546993163:
                 if str(data.emoji) == '<:emoji1:847026710780051477>':
                     guild = self.bot.get_guild(data.guild_id)
