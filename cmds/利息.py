@@ -1,10 +1,10 @@
 from core.classes import Cog_Extension
-import asyncio, os, datetime
+import asyncio, os
 from pymongo import MongoClient
-
+from datetime import datetime, timezone, timedelta
 auth_url = os.getenv("MONGODB_URI")
 
-    
+tz = timezone(timedelta(hours=+8))   
 class Task(Cog_Extension):
   def __init__(self, *args, **kwargs):
     super().__init__(*args, **kwargs)
@@ -15,7 +15,7 @@ class Task(Cog_Extension):
         cluster = MongoClient(auth_url)
         db = cluster["Economy"]
         cursor = db["Bank"]      
-        time = datetime.datetime.now().strftime('[%Y-%m-%d] [%H:%M]')
+        time = datetime.now(tz).strftime('[%Y-%m-%d] [%H:%M]')
 
         execute = {"$set": {"銀行餘額": {"$multiply": ["$銀行餘額", "$利息"]}}}
         cursor.update_many({}, [execute])
