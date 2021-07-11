@@ -1,5 +1,7 @@
 from discord.ext import commands
-import json, datetime
+import json
+from datetime import datetime, timezone, timedelta
+tz = timezone(timedelta(hours=+8))
 
 class Cog_Extension(commands.Cog):
     """用於Cog繼承基本屬性"""
@@ -43,7 +45,7 @@ class Global_Func():
 class Logger:
     def log(self, ctx, data, type='error'):
         '''事件紀錄器'''
-        time = datetime.datetime.now().strftime('[%Y-%m-%d] [%H:%M]')
+        time = datetime.now(tz).strftime('[%Y-%m-%d] [%H:%M]')
         user = ctx.author.name
         channel = ctx.channel.name
         command = ctx.command

@@ -21,9 +21,9 @@ class Owner(Cog_Extension):
 
         if reason is not None:
             if reason in levels.keys():
-                await ctx.send(Global_Func.code(lang='fix', msg=f'已清理 {num} 則訊息.\nReason: {levels[reason]}'))
+                await ctx.send(lang='fix', msg=f'已清理 {num} 則訊息.\nReason: {levels[reason]}')
         else:
-            await ctx.send(content=Global_Func.code(lang='fix', msg=f'已清理 {num} 則訊息.\nReason: {reason}'), delete_after=5.0)
+            await ctx.send(lang='fix', msg=f'已清理 {num} 則訊息.\nReason: {reason}', delete_after=5.0)
             
   @commands.command()
   @commands.has_permissions(administrator=True)

@@ -10,8 +10,7 @@ class 文字替代(Cog_Extension):
         if emoji is not None:
             if emoji.animated:
                 add = "a"
-                emojiID = emoji.id
-                return f"<{add}:{emoji.name}:{emojiID}>"
+                return f"<{add}:{emoji.name}:{emoji.id}>"
             else:
                 return f":{emoji.name}:"
         else:
