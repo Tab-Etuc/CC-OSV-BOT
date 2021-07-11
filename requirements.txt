@@ -14,3 +14,4 @@ timeago ~=1.0.15
 requests ~=2.25.1
 PyNaCl
 Pillow
+googletrans
