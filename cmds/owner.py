@@ -5,9 +5,6 @@ from core.classes import Cog_Extension
 import json, asyncio, os, re
 from config import *
 
-with open('bot_info.json', 'r', encoding='utf8') as jfile:
-   jdata = json.load(jfile)
-
 class Owner(Cog_Extension):
   def __init__(self, bot: commands.Bot):
         self.regex = re.compile(r"(\w*)\s*(?:```)(\w*)?([\s\S]*)(?:```$)")
