@@ -3,13 +3,10 @@ import discord
 from discord.ext import commands
 from PIL import Image, ImageFont, ImageDraw
 from io import BytesIO
-import random,json
+import random
 from config import *
 import aiohttp
 import requests
-
-with open('bot_info.json','r', encoding='utf8') as jfile:
-    jdata = json.load(jfile)
 
 class Fun(Cog_Extension):
   @commands.cooldown(1, 10, commands.BucketType.user)
@@ -63,7 +60,7 @@ class Fun(Cog_Extension):
   async def _owo(self, ctx, *, msg):
         await ctx.message.delete()
         if msg == "好喔":
-          好喔 = random.choice(jdata['好喔_pic'])
+          好喔 = random.choice(好喔_pic)
           await ctx.send(好喔)       
           
         else:

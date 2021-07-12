@@ -10,9 +10,10 @@ Owner_id = "806346991730819121"
 WEBHOOK_URL = "https://discord.com/api/webhooks/859633422498398288/5JVnexiCnP3BIk-kLPuAk4xDqadplNzgv-85zyS25poVDjhFjPwXz1CX0SDkbUlkcSwb"
 
 CHANGE_LOG = """
-`-` \🟢 新增 商店功能`Cshop`。
-`-` \🟢 新增 `Cmenu`指令。
-`-` \🟢 合併 音樂機器人系統 \🎶
+`-` \🟢 新增 升級利息、存額功能。
+`-` \🟢 新增 自動匯入薪資。
+`-` \🟠 分開 現金、銀行餘額。
+`-` \🔴 刪除 音樂機器人系統 \🎶
 `-` \更多內容請查閱<#835138693101912104>......
 
 """
@@ -139,7 +140,8 @@ nsfw = {
 💱 -Withdraw
 📊 -Top
 💴 -Payday
-👥 - Rob```
+👥 - Rob
+🆙 -Up```
 """
 
 實用_with_emojis = """```

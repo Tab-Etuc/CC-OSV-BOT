@@ -13,7 +13,7 @@ class Event(Cog_Extension):
   @commands.command()
   @commands.cooldown(1, 10, commands.BucketType.user)
   async def tr(self,ctx, *,message=None):
-      if message.author == self.bot.user:
+      if ctx.message.author == self.bot.user:
         return
       if message is None:
         await ctx.send("請輸入欲翻譯之文字。參見：`Ctr [文字]`")
