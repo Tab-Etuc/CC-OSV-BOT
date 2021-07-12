@@ -1,11 +1,7 @@
 from discord.ext import commands
 import discord
 from core.classes import Logger
-import json
 from config import *
-
-with open('bot_info.json', 'r', encoding='utf8') as jfile:
-   jdata = json.load(jfile)
 
 class Errors():
 	# 自訂 Error Handler
