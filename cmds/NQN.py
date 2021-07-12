@@ -2,7 +2,7 @@ import re
 from typing import Literal
 from core.classes import Cog_Extension
 import discord
-from discord import commands
+from discord.ext import commands
 
 RequestType = Literal["discord_deleted_user", "owner", "user", "user_strict"]
 
