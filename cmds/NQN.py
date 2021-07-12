@@ -27,7 +27,7 @@ class NotQuiteNitro(Cog_Extension):
         message = "".join([str(emoji) for emoji in emojis])
         await ctx.send(message)
 
-    @commands.admin_or_permissions(manage_guild=True)
+    @commands.has_permissions(administrator=True)
     @notquitenitro.command()
     async def auto(self, ctx: commands.Context):
         """Toggle automatic NQN."""
@@ -42,7 +42,7 @@ class NotQuiteNitro(Cog_Extension):
         await ctx.send(msg)
         self.opted_guilds = o
 
-    @commands.admin_or_permissions(manage_guild=True)
+    @commands.has_permissions(administrator=True)
     @notquitenitro.command()
     async def optemojis(self, ctx: commands.Context, true_or_false: bool = None):
         """
