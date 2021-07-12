@@ -12,9 +12,7 @@ from config import *
 import core.economy
 import json
 
-with open('bot_info.json','r', encoding='utf8') as jfile:
-    jdata = json.load(jfile)
-    WEBHOOK_URL = jdata["WEBHOOK_URL"]
+webhook = DiscordWebhook(url=WEBHOOK_URL)  
 
 class Game(Cog_Extension):
     @commands.command(name="老虎機", aliases=['slots', 'bet'])
