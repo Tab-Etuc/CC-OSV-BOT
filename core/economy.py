@@ -1,14 +1,12 @@
 from discord_webhook.webhook import DiscordWebhook, DiscordEmbed
-import os, json
+import os
 from pymongo import MongoClient
 import requests
 from config import *
 import time
 import random
 
-with open('bot_info.json','r', encoding='utf8') as jfile:
-    jdata = json.load(jfile)
-    WEBHOOK_URL = jdata["WEBHOOK_URL"]
+webhook = DiscordWebhook(url=WEBHOOK_URL)  
 
 mainshop = [{"name":"LuckyClover","price":77777,"description":"Work"},
             {"name":"NTD","price":100000000000000000000,"description":"Gaming"},
