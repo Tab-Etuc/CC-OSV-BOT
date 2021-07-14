@@ -65,7 +65,7 @@ class Mongo(Cog_Extension):
 
       msg = "\n".join(data)
 
-      em = DiscordEmbed(
+      em = discord.Embed(
           title=f"頂尖 {index-1}位 最富有的國民 - 排行榜 ",
           description=f"它基於全國國民的淨資產（現金+銀行餘額）||其實還沒寫好，只有銀行餘額|| \n\n{msg}",
           color=MAIN_COLOR,
