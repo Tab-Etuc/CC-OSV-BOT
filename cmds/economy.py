@@ -35,7 +35,8 @@ class Mongo(Cog_Extension):
       cluster = MongoClient(auth_url)
       db = cluster["Economy"]
       cursor = db["Bank"]
-      mydoc = cursor.find().sort("銀行餘額",-1)
+      execute2 = {"$set": {"銀行餘額": {"$add": ["$現金", "$銀行餘額"]}}}
+      mydoc = cursor.find().sort("execute2",-1)
       
       for member in mydoc:
         if index > 8:
@@ -44,20 +45,22 @@ class Mongo(Cog_Extension):
 
         member_name = self.bot.get_user(member["_id"])
         member_amt = member['銀行餘額']
+        member_amt2 = member['現金']
+        tatal = member_amt + member_amt2
         if index == 1:
-            msg1 = f"**🥇 `{member_name}` -- {member_amt}**"
+            msg1 = f"**🥇 `{member_name}` -- {tatal}**"
             data.append(msg1)
 
         if index == 2:
-            msg2 = f"**🥈 `{member_name}` -- {member_amt}**"
+            msg2 = f"**🥈 `{member_name}` -- {tatal}**"
             data.append(msg2)
 
         if index == 3:
-            msg3 = f"**🥉 `{member_name}` -- {member_amt}**\n"
+            msg3 = f"**🥉 `{member_name}` -- {tatal}**\n"
             data.append(msg3)
 
         if index >= 4:
-            members = f"**{index} `{member_name}` -- {member_amt}**"
+            members = f"**{index} `{member_name}` -- {tatal}**"
             data.append(members)
         index += 1
 
