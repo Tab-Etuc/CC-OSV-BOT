@@ -35,8 +35,7 @@ class Mongo(Cog_Extension):
       cluster = MongoClient(auth_url)
       db = cluster["Economy"]
       cursor = db["Bank"]
-      execute2 = {"$set": {"銀行餘額": {"$add": ["$現金", "$銀行餘額"]}}}
-      mydoc = cursor.find().sort(execute2,-1)
+      mydoc = cursor.find().sort("銀行餘額",-1)
       
       for member in mydoc:
         if index > 8:
