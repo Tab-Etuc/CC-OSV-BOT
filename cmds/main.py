@@ -81,14 +81,13 @@ class Main(Cog_Extension):
     @commands.cooldown(1, 10, commands.BucketType.user)
     @commands.command(aliases=['msg','MSG'])
     async def messages(self, ctx):
-        tmp = await ctx.send('正在計算訊息...')
+        await ctx.send('正在計算訊息...')
         counter = 0
         counter2 = 0
         async for log in ctx.history(limit=100000):
             counter2 += 1
             if log.author == ctx.message.author:
                 counter += 1
-        await ctx.message.delete(tmp)
         embed = discord.Embed(clolor=MAIN_COLOR)
         embed.add_field(name="成功計算！", value='你在{}則訊息中，發送了{}則訊息。這佔了其中{}%。'.format(counter2, counter, (counter * 100) // counter2))    
         embed.set_footer(text=f'由{ctx.author}請求的指令✨')
