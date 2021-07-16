@@ -215,7 +215,7 @@ class Mongo(Cog_Extension):
                 embed.add_embed_field(name='金錢', value=f' \n 薪資： **{int(users[3])}** \n\n現金餘額：**{int(users[0])}**    \n銀行餘額：**{int(users[1])}**', inline=False)
                 embed.add_embed_field(name='銀行存款等階：', value=f'[ {存額等階_data[0]} ] {存額等階_data[1]} \n [等級：**{int(users[6])}** ] \n 銀行存款額度：{int(users[4])}', inline=True)
                 embed.add_embed_field(name='銀行會員等階', value=f'[ {利息等階_data[0]} ] {利息等階_data[1]} \n [等級：**{int(users[7]) }** ] \n利息：**{round(users[5], 2)}**', inline=True)
-                embed.add_embed_field(name='一般', value=f'暱稱：`{ctx.author.nick}` \n帳號創建於：`{ctx.author.created_at.__format__('%Y年%m月%d日 %H:%M:%S')}` \n加入時間：`{ctx.author.joined_at.__format__('%Y年%m月%d日 %H:%M:%S')}` ', inline=False)
+                embed.add_embed_field(name='一般', value=f"暱稱：`{ctx.author.nick}` \n帳號創建於：`{ctx.author.created_at.__format__('%Y年%m月%d日 %H:%M:%S')}` \n加入時間：`{ctx.author.joined_at.__format__('%Y年%m月%d日 %H:%M:%S')}` ", inline=False)
                 
                 webhook.add_embed(embed)
                 webhook.delete(embed_)
@@ -232,7 +232,7 @@ class Mongo(Cog_Extension):
             embed.add_embed_field(name='金錢', value=f'\n 薪資： **{int(regi1[3])}** \n\n現金餘額：**{int(regi1[0])}**    \n銀行餘額：**{int(regi1[1])}**', inline=False)
             embed.add_embed_field(name='銀行存款等階：', value=f'[ {存額_data[0]} ] {存額_data[1]} \n [等級：{int(regi1[6])}] \n 銀行存款額度：{int(regi1[4])}', inline=True)
             embed.add_embed_field(name='銀行會員等階', value=f'[ {利息_data[0]} ] {利息_data[1]} \n [等級：**{int(regi1[7]) }** ] \n利息：**{round(regi1[5], 2)}**', inline=True)
-            embed.add_embed_field(name='一般', value=f'暱稱：`{regi.nick}` \n帳號創建於：`{regi.created_at.__format__('%Y年%m月%d日 %H:%M:%S')}` \n加入時間：`{regi.joined_at.__format__('%Y年%m月%d日 %H:%M:%S')}` ', inline=False)
+            embed.add_embed_field(name='一般', value=f"暱稱：`{regi.nick}` \n帳號創建於：`{regi.created_at.__format__('%Y年%m月%d日 %H:%M:%S')}` \n加入時間：`{regi.joined_at.__format__('%Y年%m月%d日 %H:%M:%S')}` ", inline=False)
 
             webhook.add_embed(embed)
             webhook.delete(embed_)
