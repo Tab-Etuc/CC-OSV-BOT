@@ -206,39 +206,24 @@ class Mongo(Cog_Extension):
     async def profile(self, ctx, regi: discord.Member = None):
         webhook = DiscordWebhook(url=WEBHOOK_URL)
         embed_ = await core.economy.loading()
-        user = ctx.author 
-        user1 = user
-        await core.economy.open_bank(user)
+        await core.economy.open_bank(ctx.author)
                                         
         if (regi is not None and regi.bot) or ctx.author.bot:
             webhook.delete(embed_)
             webhook = DiscordWebhook(url=WEBHOOK_URL, content=f'{ctx.author.mention}該用戶是一個BOT，不能擁有一個帳戶')
             webhook.execute(); return
         elif not regi:
-                avatar_url = str(user1.avatar_url)
-                users = await core.economy.get_bank_data(user)
-                wallet_amt = int(users[0])
-                bank_amt = int(users[1])
-                bank_lv = int(users[4])
-                薪資 = int(users[3])
-                利息 = users[5]
-                new_銀行等階 = int(users[6])   
-                利息等階 = int(users[7]) 
-                利息等階_data = await core.economy.利息_data(利息等階)
-                利息等階圖示 = 利息等階_data[0]
-                利息等階名稱 = 利息等階_data[1]
+                users = await core.economy.get_bank_data(ctx.author)
+                利息等階_data = await core.economy.利息_data(int(users[7]))
+                存額等階_data = await core.economy.存額_data(int(users[6]))
 
-                存額等階_data = await core.economy.存額_data(new_銀行等階)
-                new_銀行等階圖示 = 存額等階_data[0]
-                銀行等階名稱 = 存額等階_data[1]
-
-                embed = DiscordEmbed(title="一般用戶".format(user.name), color=MAIN_COLOR)
-                embed.set_author(name="{}的個人簡介".format(user.name), icon_url=avatar_url)
-
-                embed.add_embed_field(name="金錢", value=" \n 薪資： **{}** \n\n現金餘額：**{}**    \n銀行餘額：**{}**".format(薪資,wallet_amt, bank_amt), inline=False)
-                embed.add_embed_field(name="銀行存款等階：", value="[ {} ] {} \n [等級：**{}** ] \n 銀行存款額度：{}".format(new_銀行等階圖示,銀行等階名稱,new_銀行等階,bank_lv), inline=True)
-                embed.add_embed_field(name="銀行會員等階", value=f"[ {利息等階圖示} ] {利息等階名稱} \n [等級：**{利息等階}** ] \n利息：**{round(利息, 2)}**", inline=True)
-                embed.add_embed_field(name="一般", value=f"暱稱：`{user.nick}` \n帳號創建於：`{user.created_at.__format__('%Y年%m月%d日 %H:%M:%S')}` \n加入時間：`{user.joined_at.__format__('%Y年%m月%d日 %H:%M:%S')}` ", inline=False)
+                embed = DiscordEmbed(title="一般用戶".format(ctx.author.name), color=MAIN_COLOR)
+                embed.set_author(name="{}的個人簡介".format(ctx.author.name), icon_url=str(ctx.author.avatar_url))
+                embed.add_embed_field(name="金錢", value=" \n 薪資： **{}** \n\n現金餘額：**{}**    \n銀行餘額：**{}**".format(int(users[3]), int(users[0]), int(users[1])), inline=False)
+                embed.add_embed_field(name="銀行存款等階：", value="[ {} ] {} \n [等級：**{}** ] \n 銀行存款額度：{}".format(利息等階_data[0], 利息等階_data[1], int(users[6]), int(users[4])), inline=True)
+                embed.add_embed_field(name="銀行會員等階", value=f"[ {存額等階_data[0]} ] {存額等階_data[1]} \n [等級：**{int(users[7]) }** ] \n利息：**{round(users[5], 2)}**", inline=True)
+                embed.add_embed_field(name="一般", value=f"暱稱：`{ctx.author.nick}` \n帳號創建於：`{ctx.author.created_at.__format__('%Y年%m月%d日 %H:%M:%S')}` \n加入時間：`{ctx.author.joined_at.__format__('%Y年%m月%d日 %H:%M:%S')}` ", inline=False)
+                
                 webhook.add_embed(embed)
                 webhook.delete(embed_)
                 webhook.execute(); return
@@ -252,10 +237,10 @@ class Mongo(Cog_Extension):
             利息 = regi1[5]
             new_銀行等階 = int(regi1[6])  
             利息等階 = int(regi1[7]) 
-            利息_data = await core.economy(利息等階)
+            利息_data = await core.economy.利息_data(利息等階)
             利息等階圖示 = 利息_data[0]
             利息等階名稱 = 利息_data[1]
-            存額_data = await core.economy(new_銀行等階)
+            存額_data = await core.economy.存額_data(new_銀行等階)
             new_銀行等階圖示 = 存額_data[0]
             銀行等階名稱 = 存額_data[1]
             
@@ -493,14 +478,14 @@ class Mongo(Cog_Extension):
     @commands.guild_only()
     async def withdraw(self, ctx, *,amount= None):
         users = await core.economy.get_bank_data(ctx.author)
-
-        bank_amt = users[1]
+        embed_ = await core.economy.loading()
 
         if amount.lower() == "all" or amount.lower() == "max":
             await core.economy.update_bank(ctx.author, +1*users[1])
             await core.economy.update_bank(ctx.author, -1*users[1], "銀行餘額")
             embed=DiscordEmbed(title="成功執行！", description=f"{ctx.author.mention} 你取出了 {users[1]} 元 從你的銀行中。", color=MAIN_COLOR)
             webhook.add_embed(embed)
+            webhook.delete(embed_)
             webhook.execute()
             return
 
@@ -510,6 +495,7 @@ class Mongo(Cog_Extension):
             await ctx.message.delete()
             embed=DiscordEmbed(title=":warning: 錯誤！", description=f"{ctx.author.mention} 你沒有足夠的餘額。", color=ORANGE_COLOR)
             webhook.add_embed(embed)
+            webhook.delete(embed_)
             webhook.execute()
             return
 
@@ -517,6 +503,7 @@ class Mongo(Cog_Extension):
             await ctx.message.delete()
             embed=DiscordEmbed(title=":warning: 錯誤！", description=f"{ctx.author.mention} 金額不可為負！", color=ORANGE_COLOR)
             webhook.add_embed(embed)
+            webhook.delete(embed_)
             webhook.execute()
             return
 
@@ -525,8 +512,8 @@ class Mongo(Cog_Extension):
 
         embed=DiscordEmbed(title="成功執行！", description=f"{ctx.author.mention} 你取出了 {amount} 元 從你的銀行中。", color=MAIN_COLOR)
         webhook.add_embed(embed)
+        webhook.delete(embed_)
         webhook.execute()
-
 
     @commands.command(aliases=["dep"])
     @commands.cooldown(1, 10, commands.BucketType.user)
