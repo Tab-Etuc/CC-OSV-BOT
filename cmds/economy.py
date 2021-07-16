@@ -487,29 +487,26 @@ class Mongo(Cog_Extension):
         webhook = DiscordWebhook(url=WEBHOOK_URL, content=f"{ctx.author.mention} 請輸入`Cup (存額 / 信用卡) [all / max]`")
         webhook.execute()
         webhook.delete(embed_)   
-             
+
     @commands.command(aliases=["with"])
     @commands.cooldown(1, 10, commands.BucketType.user)
     @commands.guild_only()
     async def withdraw(self, ctx, *,amount= None):
-        user = ctx.author
-
-
-        users = await core.economy.get_bank_data(user)
+        users = await core.economy.get_bank_data(ctx.author)
 
         bank_amt = users[1]
 
         if amount.lower() == "all" or amount.lower() == "max":
-            await core.economy.update_bank(user, +1*bank_amt)
-            await core.economy.update_bank(user, -1*bank_amt, "銀行餘額")
-            embed=DiscordEmbed(title="成功執行！", description=f"{user.mention} 你取出了 {users[1]} 元 從你的銀行中。", color=MAIN_COLOR)
+            await core.economy.update_bank(ctx.author, +1*users[1])
+            await core.economy.update_bank(ctx.author, -1*users[1], "銀行餘額")
+            embed=DiscordEmbed(title="成功執行！", description=f"{ctx.author.mention} 你取出了 {users[1]} 元 從你的銀行中。", color=MAIN_COLOR)
             webhook.add_embed(embed)
             webhook.execute()
             return
 
         amount = int(amount)
 
-        if amount > bank_amt:
+        if amount > users[1]:
             await ctx.message.delete()
             embed=DiscordEmbed(title=":warning: 錯誤！", description=f"{ctx.author.mention} 你沒有足夠的餘額。", color=ORANGE_COLOR)
             webhook.add_embed(embed)
@@ -523,10 +520,10 @@ class Mongo(Cog_Extension):
             webhook.execute()
             return
 
-        await core.economy.update_bank(user, +1 * amount)
-        await core.economy.update_bank(user, -1 * amount, "銀行餘額")
+        await core.economy.update_bank(ctx.author, +1 * amount)
+        await core.economy.update_bank(ctx.author, -1 * amount, "銀行餘額")
 
-        embed=DiscordEmbed(title="成功執行！", description=f"{user.mention} 你取出了 {amount} 元 從你的銀行中。", color=MAIN_COLOR)
+        embed=DiscordEmbed(title="成功執行！", description=f"{ctx.author.mention} 你取出了 {amount} 元 從你的銀行中。", color=MAIN_COLOR)
         webhook.add_embed(embed)
         webhook.execute()
 
@@ -535,64 +532,58 @@ class Mongo(Cog_Extension):
     @commands.cooldown(1, 10, commands.BucketType.user)
     @commands.guild_only()
     async def deposit(self, ctx, *,amount= None):
-        webhook = DiscordWebhook(url=WEBHOOK_URL)
         embed_ = await core.economy.loading()
-        user = ctx.author
 
-        users = await core.economy.get_bank_data(user)
-
-        wallet_amt = users[0]
+        users = await core.economy.get_bank_data(ctx.author)
 
         if amount.lower() == "all" or amount.lower() == "max":
             if int(users[0]) > int(users[4]) - int(users[1]):
               webhook = DiscordWebhook(url=WEBHOOK_URL, content=f'{ctx.author.mention} 你的銀行存款額度為**{users[4]}**，請提升銀行額度。')
               webhook.delete(embed_)
               webhook.execute(); return
-            await core.economy.update_bank(user, -1*wallet_amt)
-            await core.economy.update_bank(user, +1*wallet_amt, "銀行餘額")
-            webhook = DiscordWebhook(url=WEBHOOK_URL, content=f"{user.mention} 你存入了 {wallet_amt}元 至你的銀行。")
+            await core.economy.update_bank(ctx.author, -1*users[0])
+            await core.economy.update_bank(ctx.author, +1*users[0], "銀行餘額")
+            webhook = DiscordWebhook(url=WEBHOOK_URL, content=f"{ctx.author.mention} 你存入了 {users[0]}元 至你的銀行。")
             webhook.delete(embed_)
             webhook.execute(); return
         else:
           if int(amount)+int(users[1]) > int(users[4]):
-            webhook.delete(embed_)
             webhook = DiscordWebhook(url=WEBHOOK_URL, content=f"{ctx.author.mention} 你的銀行存款額度為**{users[4]}**，請提升銀行額度。")
+            webhook.delete(embed_)
             webhook.execute(); return
 
           amount = int(amount)
 
-          if amount > wallet_amt:
+          if amount > users[0]:
+            webhook = DiscordWebhook(url=WEBHOOK_URL, content=f"{ctx.author.mention} 你沒有足夠的錢，ㄏㄏ")            
             webhook.delete(embed_)
-            webhook = DiscordWebhook(url=WEBHOOK_URL, content=f"{user.mention} 你沒有足夠的錢，ㄏㄏ")
             webhook.execute(); return
 
           if amount < 0:
+            webhook = DiscordWebhook(url=WEBHOOK_URL, content=f"{ctx.author.mention} 金額不可為負！")            
             webhook.delete(embed_)
-            webhook = DiscordWebhook(url=WEBHOOK_URL, content=f"{user.mention} 金額不可為負！")
             webhook.execute(); return
 
-          await core.economy.update_bank(user, -1 * amount)
-          await core.economy.update_bank(user, +1 * amount, "銀行餘額")
-          users = await core.economy.get_bank_data(user)
+          await core.economy.update_bank(ctx.author, -1 * amount)
+          await core.economy.update_bank(ctx.author, +1 * amount, "銀行餘額")
+          users = await core.economy.get_bank_data(ctx.author)
           餘額 = users[1]
+          webhook = DiscordWebhook(url=WEBHOOK_URL, content=f"{ctx.author.mention} 你存入了 **{amount}** 元 至你的**銀行！**\n你的銀行餘額現在有**{round(餘額)}**元！")
           webhook.delete(embed_)
-          webhook = DiscordWebhook(url=WEBHOOK_URL, content=f"{user.mention} 你存入了 **{amount}** 元 至你的**銀行！**\n你的銀行餘額現在有**{round(餘額)}**元！")
           webhook.execute()
 
     @commands.command(aliases=['SY','薪水','Salary','SALARY'])
     @commands.cooldown(1, 10, commands.BucketType.user)
     async def salary(self, ctx):
-        webhook = DiscordWebhook(url=WEBHOOK_URL)
-
-        embed = DiscordEmbed(title='🏦簡明銀行公告•', color='0x00bfff', description='此處列出各公職薪資如下')
-        embed.add_embed_field(name="總統", value="壹拾萬圓簡明幣", inline=True)
-        embed.add_embed_field(name="副總統", value="柒萬伍仟圓簡明幣", inline=True)
-        embed.add_embed_field(name="國務總理", value="柒萬伍仟圓簡明幣", inline=False)
-        embed.add_embed_field(name="國務院外交部部長", value="貳萬圓簡明幣", inline=False)
-        embed.add_embed_field(name="立法院院長", value="貳萬伍仟圓整", inline=False)
-        embed.add_embed_field(name="省長", value="貳萬圓簡明幣", inline=False)
-        embed.add_embed_field(name="市長", value="貳萬圓簡明幣", inline=False)
-        embed.set_footer(text=f'由{ctx.author}請求的鏈接✨\n簡明銀行支援兼創辦人•羅少希')
+        embed = DiscordEmbed(title='🏦中央銀行•', color='0x00bfff', description='此處列出各公職薪資如下')
+        embed.add_embed_field(name="總統", value="44萬8800圓簡明幣", inline=True)
+        embed.add_embed_field(name="副總統", value="33萬6700圓簡明幣", inline=True)
+        embed.add_embed_field(name="黨主席", value="25萬4000簡明幣", inline=False)                
+        embed.add_embed_field(name="國務院財政部", value="19萬6320圓簡明幣", inline=False)
+        embed.add_embed_field(name="國務院外交部部長", value="17萬9520圓簡明幣", inline=False)
+        embed.add_embed_field(name="大法官", value="19萬5000圓簡明幣", inline=False)                        
+        embed.add_embed_field(name="立法委員", value="19萬0500圓簡明幣", inline=False)
+        embed.set_footer(text=f'由{ctx.author}請求的鏈接✨\n中央銀行支援兼創辦人•羅少希')
         webhook.add_embed(embed)
         webhook.execute()
 
