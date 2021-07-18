@@ -1,6 +1,6 @@
 import discord
 from discord.ext import commands
-import os, random
+import os, random, math
 from pymongo import MongoClient
 from core.classes import Cog_Extension
 import core.economy
@@ -380,16 +380,37 @@ class Mongo(Cog_Extension):
               存款額度 = int(users[4])
               銀行等階 = int(users[6])
               現金 = int(users[0])
-              要扣的錢 = 存款額度*-0.8
-              new_存款額度 = 存款額度*1.2 - 存款額度
+              要扣的錢 = math.floor(存款額度*-0.8)
+              new_存款額度 = math.floor(存款額度*1.2 - 存款額度)
               if 現金+要扣的錢 < 0:
                 if int(users[1]) >= 要扣的錢:
-                  webhook = DiscordWebhook(url=WEBHOOK_URL, content=f'{ctx.author.mention} 你的現金不足{round(-1*要扣的錢)}。\n你可以使用`Cwith {round(-1*要扣的錢)}`將現金從銀行取出。')
-                  webhook.execute()
+                  webhook = DiscordWebhook(url=WEBHOOK_URL, content=f'{ctx.author.mention} 你的現金不足{-1*要扣的錢}。\n你可以點擊下方表情符號 <a:V_:858154997640331274> ——使用銀行餘額進行升級。')
+                  await message.add_reaction("<a:V_:858154997640331274>")
+                  sent_webhook = webhook.execute()
                   webhook.delete(embed_)   
+                  def check(reaction, user):
+                    return user == ctx.author and str(reaction.emoji) in ["<a:V_:858154997640331274>"]
+                  while True:
+                    try:
+                        reaction, user = await self.bot.wait_for("reaction_add", timeout=15, check=check)
+
+                        if str(reaction.emoji) == "<a:V_:858154997640331274>":
+                            embed_ = await core.economy.loading()
+                            await core.economy.update_bank(user, 要扣的錢,'現金')
+                            await core.economy.update_bank(user, new_存款額度 ,'存款額度')
+                            await core.economy.update_bank(user, 1,'銀行等階')
+                            webhook.content = f'{ctx.author.mention}\n {new_銀行等階圖示}：你的存款上限已上升**{new_存款額度}**至**{new_存款額度 + 存款額度}**。'
+                            sent_webhook = webhook.edit(sent_webhook)
+                            await message.remove_reaction(reaction, user)
+                            webhook.delete(embed_)   
+                        else:
+                            await message.remove_reaction(reaction, user)
+                    except asyncio.TimeoutError:
+                        await message.delete()
+                        break
                   return    
                 else:
-                  webhook = DiscordWebhook(url=WEBHOOK_URL, content=f'{ctx.author.mention} 你的現金不足{round(-1*要扣的錢)}。')
+                  webhook = DiscordWebhook(url=WEBHOOK_URL, content=f'{ctx.author.mention} 你的現金不足{-1*要扣的錢}。')
                   webhook.execute()
                   webhook.delete(embed_)   
                   return    
@@ -416,9 +437,8 @@ class Mongo(Cog_Extension):
           users = await core.economy.get_bank_data(user)
           現金 = int(users[0]) 
           利息等階 = int(users[7]) 
-          利息= round(0.1, 1)
           NEW_利息 = int(users[5])
-          要扣的錢 = (利息等階 ** 10 *500000)*-1
+          要扣的錢 = (利息等階 ** 10 *500000)*-1)
           data = 0
           if -1*要扣的錢 == 現金+要扣的錢:
                 data += 1
@@ -427,9 +447,9 @@ class Mongo(Cog_Extension):
           elif -1*要扣的錢 > 現金+要扣的錢:
               if data != 1:
                 if int(users[1]) > 要扣的錢:
-                  webhook = DiscordWebhook(url=WEBHOOK_URL, content=f'{ctx.author.mention} 你的現金不足{round(-1*要扣的錢)}。你可以使用`Cwith {round(-1*要扣的錢)}`將現金從銀行取出。')
+                  webhook = DiscordWebhook(url=WEBHOOK_URL, content=f'{ctx.author.mention} 你的現金不足{-1*要扣的錢}。你可以使用`Cwith {-1*要扣的錢}`將現金從銀行取出。')
                 else:
-                  webhook = DiscordWebhook(url=WEBHOOK_URL, content=f'{ctx.author.mention} 你的現金不足{round(-1*要扣的錢)}，這將使你無法提升任何一銀行等階。')
+                  webhook = DiscordWebhook(url=WEBHOOK_URL, content=f'{ctx.author.mention} 你的現金不足{要扣的錢}，這將使你無法提升任何一銀行等階。')
                 webhook.execute()
                 webhook.delete(embed_)   
                 return    
@@ -439,15 +459,15 @@ class Mongo(Cog_Extension):
             webhook.delete(embed_)   
             return
           await core.economy.update_bank(user, 要扣的錢,'現金')
-          await core.economy.update_bank(user,利息,'利息')
+          await core.economy.update_bank(user,0.1,'利息')
           await core.economy.update_bank(user, 1,'利息等階')
           users = await core.economy.get_bank_data(user)
           利息等階 = int(users[7]) 
-          NEW_利息 = round(users[5], 3)
+          NEW_利息 = math.ceil(users[5], 3)
           利息等階_data = await core.economy.利息_data(利息等階)
           利息等階圖示 = 利息等階_data[0]
           利息等階名稱 = 利息等階_data[1]
-          webhook = DiscordWebhook(url=WEBHOOK_URL, content=f'{ctx.author.mention} 你已晉升至{利息等階圖示}**{利息等階名稱}**。你的銀行利息變更為**{round(NEW_利息-1, 3)*100}%**/**每小時**')
+          webhook = DiscordWebhook(url=WEBHOOK_URL, content=f'{ctx.author.mention} 你已晉升至{利息等階圖示}**{利息等階名稱}**。你的銀行利息變更為**{math.floor(NEW_利息-1, 2)*100}%**/**每小時**')
           webhook.execute()
           webhook.delete(embed_)   
           return
