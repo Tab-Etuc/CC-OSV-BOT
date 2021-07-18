@@ -385,6 +385,7 @@ class Mongo(Cog_Extension):
               if 現金+要扣的錢 < 0:
                 if int(users[1]) >= 要扣的錢:
                   webhook = DiscordWebhook(url=WEBHOOK_URL, content=f'{ctx.author.mention} 你的現金不足{-1*要扣的錢}。\n你可以點擊下方表情符號 <a:V_:858154997640331274> ——使用銀行餘額進行升級。')
+                  message = webhook
                   await message.add_reaction("<a:V_:858154997640331274>")
                   sent_webhook = webhook.execute()
                   webhook.delete(embed_)   
