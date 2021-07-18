@@ -395,7 +395,8 @@ class Mongo(Cog_Extension):
 
                         if str(reaction.emoji) == "<a:V_:858154997640331274>":
                             embed_ = await core.economy.loading()
-                            await message.remove_reaction(reaction, user)                            
+                            await message.remove_reaction(reaction, user)
+                            await message.remove_reaction(reaction, self.bot)                            
                             存額等階_data = await core.economy.存額_data(銀行等階)
                             new_銀行等階圖示 = 存額等階_data[0]      
                             await core.economy.update_bank(user, 要扣的錢,'銀行餘額')
