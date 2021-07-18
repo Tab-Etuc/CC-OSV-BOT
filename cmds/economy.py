@@ -438,7 +438,7 @@ class Mongo(Cog_Extension):
           現金 = int(users[0]) 
           利息等階 = int(users[7]) 
           NEW_利息 = int(users[5])
-          要扣的錢 = (利息等階 ** 10 *500000)*-1)
+          要扣的錢 = (利息等階 ** 10 *500000)*-1
           data = 0
           if -1*要扣的錢 == 現金+要扣的錢:
                 data += 1
