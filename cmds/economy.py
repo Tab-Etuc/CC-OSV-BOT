@@ -401,8 +401,10 @@ class Mongo(Cog_Extension):
                             await message.edit(f'{ctx.author.mention}\n {new_銀行等階圖示}：你的存款上限已上升**{new_存款額度}**至**{new_存款額度 + 存款額度}**。')
                             await message.remove_reaction(reaction, user)
                             webhook.delete(embed_)   
+                            return
                         else:
                             await message.remove_reaction(reaction, user)
+                            return
                     except asyncio.TimeoutError:
                         await message.delete()
                         break
