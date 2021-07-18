@@ -384,7 +384,7 @@ class Mongo(Cog_Extension):
               new_存款額度 = math.floor(存款額度*1.2 - 存款額度)
               if 現金+要扣的錢 < 0:
                 if int(users[1]) >= 要扣的錢:
-                  messages = await ctx.send(f'{ctx.author.mention} 你的現金不足{-1*要扣的錢}。\n你可以點擊下方表情符號 <a:V_:858154997640331274> ——使用銀行餘額進行升級。')
+                  message = await ctx.send(f'{ctx.author.mention} 你的現金不足{-1*要扣的錢}。\n你可以點擊下方表情符號 <a:V_:858154997640331274> ——使用銀行餘額進行升級。')
                   await message.add_reaction("<a:V_:858154997640331274>")
                   webhook.delete(embed_)   
                   def check(reaction, user):
