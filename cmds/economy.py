@@ -395,7 +395,7 @@ class Mongo(Cog_Extension):
 
                         if str(reaction.emoji) == "<a:V_:858154997640331274>":
                             embed_ = await core.economy.loading()
-                            await core.economy.update_bank(user, 要扣的錢,'現金')
+                            await core.economy.update_bank(user, 要扣的錢,'銀行餘額')
                             await core.economy.update_bank(user, new_存款額度 ,'存款額度')
                             await core.economy.update_bank(user, 1,'銀行等階')
                             await message.edit(f'{ctx.author.mention}\n {new_銀行等階圖示}：你的存款上限已上升**{new_存款額度}**至**{new_存款額度 + 存款額度}**。')
