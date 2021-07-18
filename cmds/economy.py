@@ -384,10 +384,8 @@ class Mongo(Cog_Extension):
               new_存款額度 = math.floor(存款額度*1.2 - 存款額度)
               if 現金+要扣的錢 < 0:
                 if int(users[1]) >= 要扣的錢:
-                  webhook = DiscordWebhook(url=WEBHOOK_URL, content=f'{ctx.author.mention} 你的現金不足{-1*要扣的錢}。\n你可以點擊下方表情符號 <a:V_:858154997640331274> ——使用銀行餘額進行升級。')
-                  message = webhook
+                  messages = await ctx.send(f'{ctx.author.mention} 你的現金不足{-1*要扣的錢}。\n你可以點擊下方表情符號 <a:V_:858154997640331274> ——使用銀行餘額進行升級。')
                   await message.add_reaction("<a:V_:858154997640331274>")
-                  sent_webhook = webhook.execute()
                   webhook.delete(embed_)   
                   def check(reaction, user):
                     return user == ctx.author and str(reaction.emoji) in ["<a:V_:858154997640331274>"]
@@ -400,8 +398,7 @@ class Mongo(Cog_Extension):
                             await core.economy.update_bank(user, 要扣的錢,'現金')
                             await core.economy.update_bank(user, new_存款額度 ,'存款額度')
                             await core.economy.update_bank(user, 1,'銀行等階')
-                            webhook.content = f'{ctx.author.mention}\n {new_銀行等階圖示}：你的存款上限已上升**{new_存款額度}**至**{new_存款額度 + 存款額度}**。'
-                            sent_webhook = webhook.edit(sent_webhook)
+                            await message.edit(f'{ctx.author.mention}\n {new_銀行等階圖示}：你的存款上限已上升**{new_存款額度}**至**{new_存款額度 + 存款額度}**。')
                             await message.remove_reaction(reaction, user)
                             webhook.delete(embed_)   
                         else:
