@@ -409,6 +409,7 @@ class Mongo(Cog_Extension):
                             return
                     except asyncio.TimeoutError:
                         await message.delete()
+                        await message.delete()
                         break
                   return    
                 else:
