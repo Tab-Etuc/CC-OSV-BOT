@@ -372,6 +372,7 @@ class Economy(Cog_Extension):
               銀行等階 = 0
               現金 = int(users[0])
               扣錢 = math.floor(存款額度*-0.8)
+              真_要扣的錢 = 0
               if 現金+扣錢 < 0:
                   if int(users[1]) >= 扣錢:
                     webhook = DiscordWebhook(url=WEBHOOK_URL, content=f'{ctx.author.mention} 你的現金不足{round(-1*扣錢)}，這將使你無法提升任何一銀行等階。\n你可以使用`Cwith {round(-1*扣錢)}`將現金從銀行取出。')
@@ -383,8 +384,7 @@ class Economy(Cog_Extension):
                     webhook.execute()
                     webhook.delete(embed_); return
 
-              真_要扣的錢 = 0
-              現金 += 扣錢  
+              
               
               while 現金+扣錢 >= 0:  #使用while迴圈計算，當使用者餘額不足時停止
                   銀行等階 += 1
