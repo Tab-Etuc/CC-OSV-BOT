@@ -369,7 +369,7 @@ class Economy(Cog_Extension):
             if mode_all.lower() == 'all' or mode_all.lower() == 'max': #當上述文字為[ all / max ]
               users = await core.economy.get_bank_data(user)
               存款額度 = int(users[4])
-              銀行等階 = int(users[6])
+              銀行等階 = 0
               現金 = int(users[0])
               扣錢 = math.floor(存款額度*-0.8)
               if 現金+扣錢 < 0:
@@ -392,7 +392,7 @@ class Economy(Cog_Extension):
                   存款額度 += math.floor(存款額度*1.2) - 存款額度
                   現金 += 扣錢  
                   真_要扣的錢 += 扣錢 
-
+              存款額度 -= int(users[4])
               await core.economy.update_bank(user, 真_要扣的錢,'現金')
               await core.economy.update_bank(user, 存款額度 ,'存款額度')
               await core.economy.update_bank(user, 銀行等階,'銀行等階')
