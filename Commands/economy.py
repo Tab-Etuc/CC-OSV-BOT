@@ -388,8 +388,8 @@ class Economy(Cog_Extension):
               
               while 現金+扣錢 >= 0:  #使用while迴圈計算，當使用者餘額不足時停止
                   銀行等階 += 1
-                  扣錢 = math.floor(存款額度 * -0.8)
-                  存款額度 += math.floor(存款額度*1.2) - 存款額度
+                  扣錢 == math.floor(存款額度 * -0.8)
+                  存款額度 += math.floor(存款額度*0.2)
                   現金 += 扣錢  
                   真_要扣的錢 += 扣錢 
               存款額度 -= int(users[4])
@@ -414,7 +414,7 @@ class Economy(Cog_Extension):
               銀行等階 = int(users[6])
               現金 = int(users[0])
               要扣的錢 = math.floor(存款額度*-0.8)
-              new_存款額度 = math.floor(存款額度*1.2 - 存款額度)
+              new_存款額度 = math.floor(存款額度*0.2)
 
               if 現金+要扣的錢 < 0:
                 if int(users[1]) >= 要扣的錢: #當使用者的銀行餘額足夠升級，然現金不足
