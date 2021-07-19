@@ -2,7 +2,7 @@ import random
 import asyncio
 from discord_webhook.webhook import DiscordWebhook
 from discord.ext import commands
-from cmds.games import tictactoe, wumpus, minesweeper, twenty
+from Commands.games import tictactoe, wumpus, minesweeper, twenty
 from core.classes import Cog_Extension
 from discord import Embed
 from discord_components import DiscordComponents, Button, ButtonStyle

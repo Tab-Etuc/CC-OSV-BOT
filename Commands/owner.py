@@ -2,11 +2,11 @@ import discord
 from discord import Embed
 from discord.ext import commands
 from core.classes import Cog_Extension
-import json, asyncio, os, re
+import asyncio, os, re
 from config import *
 
 class Owner(Cog_Extension):
-  def __init__(self, bot: commands.Bot):
+  def __init__(self, bot):
         self.regex = re.compile(r"(\w*)\s*(?:```)(\w*)?([\s\S]*)(?:```$)")
 
   @property
@@ -99,25 +99,25 @@ class Owner(Cog_Extension):
   @commands.command()
   @commands.has_permissions(administrator=True)
   async def load(self, ctx, extension):
-    self.bot.load_extension(f'cmds.{extension}')
+    self.bot.load_extension(f'Commands.{extension}')
     await ctx.send(f'Loaded {extension} done.')
 
   @commands.command()
   @commands.has_permissions(administrator=True)
   async def unload(self, ctx, extension):
-    self.bot.unload_extension(f'cmds.{extension}')
+    self.bot.unload_extension(f'Commands.{extension}')
     await ctx.send(f'Un - Loaded {extension} done.')
 
   @commands.command()
   @commands.has_permissions(administrator=True)
   async def reload(self, ctx, extension):
     if extension == '*':
-      for filename in os.listdir('./cmds'):
+      for filename in os.listdir('./Commands'):
         if filename.endswith('.py'):
-          self.bot.reload_extension(f'cmds.{filename[:-3]}')
+          self.bot.reload_extension(f'Commands.{filename[:-3]}')
       await ctx.send(f'Re - Loaded All done.')
     else:
-      self.bot.reload_extension(f'cmds.{extension}')
+      self.bot.reload_extension(f'Commands.{extension}')
       await ctx.send(f'Re - Loaded {extension} done.')
 
   @commands.command()

@@ -4,7 +4,7 @@ from pymongo import MongoClient
 import requests
 from config import *
 import time
-import random
+
 
 webhook = DiscordWebhook(url=WEBHOOK_URL)  
 

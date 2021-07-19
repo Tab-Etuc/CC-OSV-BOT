@@ -22,9 +22,9 @@ async def on_ready():
     
 
 
-for filename in os.listdir('./cmds'):
+for filename in os.listdir('./Commands'):
     if filename.endswith('.py'):
-        bot.load_extension(f'cmds.{filename[:-3]}')
+        bot.load_extension(f'Commands.{filename[:-3]}')
 
 if __name__ == "__main__":
   bot.run(TOKEN2)
