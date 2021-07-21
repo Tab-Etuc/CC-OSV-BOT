@@ -3,7 +3,7 @@ import os
 from pymongo import MongoClient
 import requests
 from config import *
-import time
+import time, random, discord, asyncio
 
 
 webhook = DiscordWebhook(url=WEBHOOK_URL)  
@@ -16,13 +16,11 @@ mainshop = [{"name":"LuckyClover","price":77777,"description":"Work"},
             ]
 
 auth_url = os.getenv("MONGODB_URI")
+cluster = MongoClient(auth_url)
+db = cluster["Economy"]
+cursor = db["Bank"]
 
 async def open_bank(user):
-    cluster = MongoClient(auth_url)
-    db = cluster["Economy"]
-
-    cursor = db["Bank"]
-
     try:
         post = {"_id": user.id, "現金": 5000, "銀行餘額": 0,  "Roulette":0, "薪資":19000, "who":0, "課稅":0.97, "存款額度":250000,"利息":1.01,"真實的薪資":9000,"利息等階":1,"Rob":0}
 
@@ -31,12 +29,14 @@ async def open_bank(user):
     except:
         pass
 
-async def loading():
-    webhook = DiscordWebhook(url='https://discord.com/api/webhooks/859633422498398288/5JVnexiCnP3BIk-kLPuAk4xDqadplNzgv-85zyS25poVDjhFjPwXz1CX0SDkbUlkcSwb')
-    embed= DiscordEmbed(title="讀取中......", description="請稍等。", color=MAIN_COLOR)
-    webhook.add_embed(embed)
-    刪除 = webhook.execute(embed)
-    return 刪除
+async def loading(ctx):
+    webhook = await ctx.channel.create_webhook(name = "CC-OSV-WebHook")
+    embed= discord.Embed(title="讀取中......", description="請稍等。", color=MAIN_COLOR)
+    刪除 = await webhook.send(embed=embed, username = '˚₊ ࣪« 中央銀行 » ࣪ ˖', avatar_url = 'https://imgur.com/csEpNAa.png', allowed_mentions=discord.AllowedMentions(everyone=False, users=False, roles=False, replied_user=False),wait=True)
+
+    return 刪除, webhook
+
+
 
 async def open_account(user):
 
@@ -104,11 +104,6 @@ async def buy_this(user,item_name,amount,new):
   return [True,"Worked"]
 
 async def get_bank_data(user):
-    cluster = MongoClient(auth_url)
-    db = cluster["Economy"]
-
-    cursor = db["Bank"]
-
     user_data = cursor.find({"_id": user.id})
 
     cols = ["現金", "銀行餘額","Roulette", "薪資", "存款額度", "利息","銀行等階","利息等階","Rob"]
@@ -123,11 +118,6 @@ async def get_bank_data(user):
     return data
 
 async def get_國庫():
-    cluster = MongoClient(auth_url)
-    db = cluster["Economy"]
-
-    cursor = db["Bank"]
-
     user_data = cursor.find({"_id": "國庫"})
 
     cols = ["當周所得", "餘額"]
@@ -142,54 +132,44 @@ async def get_國庫():
     return data
 
 async def update_bank(user, amount=0, mode="現金"):
-    cluster = MongoClient(auth_url)
-    db = cluster["Economy"]
-
-    cursor = db["Bank"]
-
     cursor.update_one({"_id": user.id}, {"$inc": {str(mode): amount}})
 
 async def update_set_bank(user, amount=0, mode="現金"):
-    cluster = MongoClient(auth_url)
-    db = cluster["Economy"]
-
-    cursor = db["Bank"]
-
     cursor.update_one({"_id": user.id}, {"$set": {str(mode): amount}})
 
 async def 利息_data(利息等階):
     if 利息等階 == 1:
-        利息等階圖示 ="<:__:861522025008463883>"
+        利息等階圖示 ="<:__:852028673363279893>"
         利息等階名稱="普卡 | Classic"
     elif 利息等階 == 2:
-        利息等階圖示 ="<:__:861522025000468501>"
+        利息等階圖示 ="<:__:852028672760348703>"
         利息等階名稱="金卡 | Gold"
     elif 利息等階 == 3:
-        利息等階圖示 ="<:__:861522025704849408>"
+        利息等階圖示 ="<:__:852028673280311356>"
         利息等階名稱="白金卡 | Platinum"
     elif 利息等階 == 4:
-        利息等階圖示 ="<:__:861522025378349096>"
+        利息等階圖示 ="<:__:852028672823394305>"
         利息等階名稱="御璽卡 | Signature"
     elif 利息等階 == 5:
-        利息等階圖示 ="<:__:861522024999419914>"
+        利息等階圖示 ="<:__:852028672655097856>"
         利息等階名稱="無限卡 | Infinite"
     return [利息等階圖示, 利息等階名稱]
 
 async def 存額_data(new_銀行等階):
     if new_銀行等階 == 1 :
-        new_銀行等階圖示 = "<:woof:861185764786962442>"
+        new_銀行等階圖示 = "<:__:861046014223450122>"
         銀行等階名稱= "木階"
     elif new_銀行等階 >=2 and new_銀行等階 <5:
-        new_銀行等階圖示 = "<:iron:861474687917359114>"
+        new_銀行等階圖示 = "<:__:851791224310595594>"
         銀行等階名稱= "白鐵階"
     elif new_銀行等階 >=5 and new_銀行等階 <50:
-        new_銀行等階圖示 = "<:gold:861186184340045844>"
+        new_銀行等階圖示 = "<:__:861046014336696341>"
         銀行等階名稱= "黃金階"
     elif new_銀行等階 >=50 and new_銀行等階 <100:
-        new_銀行等階圖示 = "<:diamond:861185706336845834>"
+        new_銀行等階圖示 = "<:__:861046013792223243>"
         銀行等階名稱= "鑽石階"
     elif new_銀行等階 >=100:
-        new_銀行等階圖示 = "<:emerald:861185706370400266>"
+        new_銀行等階圖示 = "<:__:861046014088577024>"
         銀行等階名稱= "翡翠階"
     return [new_銀行等階圖示, 銀行等階名稱]
 
