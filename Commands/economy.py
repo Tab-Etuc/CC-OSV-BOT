@@ -7,6 +7,7 @@ from core.classes import Cog_Extension
 import core.economy
 from discord_webhook.webhook import DiscordWebhook, DiscordEmbed
 from config import *
+from core.economy import *
 import requests
 
 
@@ -466,8 +467,9 @@ class Economy(Cog_Extension):
               if 現金+要扣的錢 < 0:
                 if int(users[1]) >= 要扣的錢: #當使用者的銀行餘額足夠升級，然現金不足
                   webhook = await ctx.channel.create_webhook(name = "CC-OSV-WebHook")
-                  message=discord.Embed(title=':warning: 錯誤！', description=f'{ctx.author.mention} 你的現金不足{-1*要扣的錢}。\n你可以點擊下方表情符號 <a:V_:858154997640331274> ——使用銀行餘額進行升級。', color=ORANGE_COLOR)
-                  await webhook.send(embed=message, username = '˚₊ ࣪« 中央銀行 » ࣪ ˖', avatar_url = 'https://imgur.com/csEpNAa.png', allowed_mentions=discord.AllowedMentions(everyone=False, users=False, roles=False, replied_user=False),wait=True)
+                  embed = discord.Embed(title=':warning: 錯誤！', description=f'{ctx.author.mention} 你的現金不足{-1*要扣的錢}。', color=ORANGE_COLOR)
+                  await webhook.send(embed=embed, username = '˚₊ ࣪« 中央銀行 » ࣪ ˖', avatar_url = 'https://imgur.com/csEpNAa.png', allowed_mentions=discord.AllowedMentions(everyone=False, users=False, roles=False, replied_user=False),wait=True)
+                  message = await ctx.send("你可以點擊下方表情符號 <a:V_:858154997640331274> ——使用銀行餘額進行升級。")
                   await webhook.delete()
                   await embed_[0].delete()
                   await embed_[1].delete()
@@ -600,8 +602,8 @@ class Economy(Cog_Extension):
         embed_ = await core.economy.loading(ctx)
 
         if amount.lower() == 'all' or amount.lower() == 'max':
-            await core.economy.update_bank(ctx.author, +1*users[1])
-            await core.economy.update_bank(ctx.author, -1*users[1], '銀行餘額')
+            await core.economy.update_bank(ctx.author, +1*int(users[1]))
+            await core.economy.update_bank(ctx.author, -1*int(users[1]), '銀行餘額')
 
             embed=discord.Embed(title='<a:V_:858154997640331274> 成功執行！', description=f'{ctx.author.mention} 你取出了 {users[1]} 元 從你的銀行中。', color=MAIN_COLOR)
             webhook = await ctx.channel.create_webhook(name = "CC-OSV-WebHook")
@@ -626,8 +628,8 @@ class Economy(Cog_Extension):
             await webhook.send(embed=embed, username = '˚₊ ࣪« 中央銀行 » ࣪ ˖', avatar_url = 'https://imgur.com/csEpNAa.png', allowed_mentions=discord.AllowedMentions(everyone=False, users=False, roles=False, replied_user=False))
             await webhook.delete(); return
 
-        await core.economy.update_bank(ctx.author, +1 * amount)
-        await core.economy.update_bank(ctx.author, -1 * amount, '銀行餘額')
+        await core.economy.update_bank(ctx.author, +1 * int(amount))
+        await core.economy.update_bank(ctx.author, -1 * int(amount), '銀行餘額')
 
         embed=discord.Embed(title='<a:V_:858154997640331274> 成功執行！', description=f'{ctx.author.mention} 你取出了 {amount} 元 從你的銀行中。', color=MAIN_COLOR)
         webhook = await ctx.channel.create_webhook(name = "CC-OSV-WebHook")
@@ -656,8 +658,8 @@ class Economy(Cog_Extension):
               await embed_[0].delete()
               await embed_[1].delete(); return
               
-            await core.economy.update_bank(ctx.author, -1*users[0])
-            await core.economy.update_bank(ctx.author, +1*users[0], '銀行餘額')
+            await core.economy.update_bank(ctx.author, -1*int(users[0]))
+            await core.economy.update_bank(ctx.author, +1*int(users[0]), '銀行餘額')
             webhook = await ctx.channel.create_webhook(name = "CC-OSV-WebHook")
             embed=discord.Embed(title=':warning: 錯誤！', description=f'{ctx.author.mention} 你存入了 {users[0]}元 至你的銀行。', color=ORANGE_COLOR)
             await webhook.send(embed=embed, username = '˚₊ ࣪« 中央銀行 » ࣪ ˖', avatar_url = 'https://imgur.com/csEpNAa.png', allowed_mentions=discord.AllowedMentions(everyone=False, users=False, roles=False, replied_user=False))
@@ -676,9 +678,7 @@ class Economy(Cog_Extension):
             await embed_[1].delete(); return
             
 
-          amount = int(amount)
-
-          if amount > users[0]:
+          if int(amount) > users[0]:
             webhook = await ctx.channel.create_webhook(name = "CC-OSV-WebHook")
             embed=discord.Embed(title=':warning: 錯誤！', description=f'{ctx.author.mention} 你沒有足夠的錢，ㄏㄏ', color=ORANGE_COLOR)
             await webhook.send(embed=embed, username = '˚₊ ࣪« 中央銀行 » ࣪ ˖', avatar_url = 'https://imgur.com/csEpNAa.png', allowed_mentions=discord.AllowedMentions(everyone=False, users=False, roles=False, replied_user=False))
@@ -686,7 +686,7 @@ class Economy(Cog_Extension):
             await embed_[0].delete()
             await embed_[1].delete(); return
 
-          if amount < 0:
+          if int(amount) < 0:
               webhook = await ctx.channel.create_webhook(name = "CC-OSV-WebHook")
               embed=discord.Embed(title=':warning: 錯誤！', description=f'{ctx.author.mention} 金額不可為負！', color=ORANGE_COLOR)
               await webhook.send(embed=embed, username = '˚₊ ࣪« 中央銀行 » ࣪ ˖', avatar_url = 'https://imgur.com/csEpNAa.png', allowed_mentions=discord.AllowedMentions(everyone=False, users=False, roles=False, replied_user=False))
@@ -694,8 +694,8 @@ class Economy(Cog_Extension):
               await embed_[0].delete()
               await embed_[1].delete(); return
 
-          await core.economy.update_bank(ctx.author, -1 * amount)
-          await core.economy.update_bank(ctx.author, +1 * amount, '銀行餘額')
+          await core.economy.update_bank(ctx.author, -1 * int(amount))
+          await core.economy.update_bank(ctx.author, +1 * int(amount), '銀行餘額')
           users = await core.economy.get_bank_data(ctx.author)
           webhook = await ctx.channel.create_webhook(name = "CC-OSV-WebHook")
           embed=discord.Embed(title='<a:V_:858154997640331274> 成功執行！', description=f'{ctx.author.mention} 你存入了 **{math.floor(amount)}** 元 至你的**銀行！**\n你的銀行餘額現在有**{math.floor(users[1])}**元！', color=MAIN_COLOR)
@@ -729,7 +729,12 @@ class Economy(Cog_Extension):
     @commands.command()
     @commands.cooldown(1, 10, commands.BucketType.user)
     async def shop(self, ctx):
-        embed = discord.Embed(colour=discord.Colour(0xfdf74e),description=f'**如欲購買物品請使用`Cbuy 物品 [數量]`**\n\n**CC-OSV SHOP - Page 1/2**\n<:__:852032874940858380> `luckyclover` - 為賭博性質的遊戲提升些許成功機率。 | **77,777** <:coin:852035374636728320>\n<:NTD:852048045695827988> `NTD` - 簡明幣🔀新台幣20$ | **1e20** <:coin:852035374636728320>\n⌚ `watch` - 可見顯示現在時間之頻道。 | **200,000** <:coin:852035374636728320>\n<:key:852056890707279892> `namecolor` - 獲取進入<#846673897079308288>的頻道鑰匙。 | **2,000,000** <:coin:852035374636728320>\n<:key:852056890707279892> `BGTutorials` - 購買Discord背景更換教學。 | **99,879** <:coin:852035374636728320> ')
+        embed=discord.Embed(title='簡明市廛', description='如欲購買物品請使用`Cbuy [物品名稱/物品標號] `\n\n· · - ┈┈━━ ˚ . ✿ . ˚ ━━┈┈ - · ·', color=PINK_COLOR)
+        embed.add_field(name='1  <:bal:867668445645373480>77,777•四葉幸運草' , value='>>> •獲得身分組： <@&852083684685119488> \n •為賭博性質的遊戲提升些許成功機率。', inline=False)
+        embed.add_field(name='2  <:bal:867668445645373480>1e20•新臺幣', value='>>> •獲得身分組：無 \n •簡明幣🔀新台幣20$', inline=False)
+        embed.add_field(name="3  <:bal:867668445645373480>200,000•手錶⌚", value=">>> •獲得身分組：<@&852049088395476992>\n •可見<#852364573095755808>與<#852346393141182484>頻道。", inline=False)
+        embed.add_field(name="4  <:bal:867668445645373480>2,000,000•替換名稱顏色鑰匙<:key:852056890707279892>", value=">>> •獲得身分組：<@&852084041192964096>\n•開啟<#846673897079308288>頻道。可於此處替換名稱顏色。", inline=False)
+        embed.add_field(name="5  <:bal:867668445645373480>99,879•Discord背景模板更換教學", value=">>> •獲得身分組：<@&854580418632351804> \n•開啟<#854578071990829056>頻道。可於此處查看更換Discord背景之教學。", inline=False)
         embed.set_footer(text=f'由{ctx.author}請求的鏈接✨')
         webhook = await ctx.channel.create_webhook(name = "CC-OSV-WebHook")
         await webhook.send(embed=embed, username = '˚₊ ࣪« 中央銀行 » ࣪ ˖', avatar_url = 'https://imgur.com/csEpNAa.png', allowed_mentions=discord.AllowedMentions(everyone=False, users=False, roles=False, replied_user=False))

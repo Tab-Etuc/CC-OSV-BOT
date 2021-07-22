@@ -3,8 +3,16 @@ from discord.ext import commands
 from core.classes import Cog_Extension
 import datetime, psutil, requests
 from config import *
+import requests
 
 class Main(Cog_Extension):
+    @commands.cooldown(1, 10, commands.BucketType.user)
+    @commands.command(aliases = ['tr'])
+    async def 翻譯(self, ctx, *, message = None):
+        
+            URL = f'https://www.google.com/inputtools/request?text={message}&ime=zh-hant-t-i0&cb=?'
+            message = requests.post(url=URL)
+            await ctx.send(message.content)
     @commands.cooldown(1, 10, commands.BucketType.user)
     @commands.command(aliases = ['covid-19', 'covid19','COVID'])
     async def covid(self, ctx, *, countryName = None):
