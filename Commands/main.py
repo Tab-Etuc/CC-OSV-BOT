@@ -10,8 +10,11 @@ class Main(Cog_Extension):
     @commands.command(aliases = ['trs'])
     async def 翻譯(self, ctx, *, message = None):
             message = message.replace(' ', '=')
+            if message[-1] == 'i':
+                message = message.replace('i', 'i=')
+            if message[-1] == 'p':
+                message = message.replace('p', 'p=')
             URL = f'https://www.google.com/inputtools/request?text={message}&ime=zh-hant-t-i0&cb=?'
-            
             message = requests.post(url=URL)
             message = message.json()
             await ctx.send((message[1][0][1][0]))

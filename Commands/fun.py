@@ -46,6 +46,7 @@ class Fun(Cog_Extension):
         if thingy == something[5]:
             funny_text = "你有很長的壽命！OwO"
             embed_color = MAIN_COLOR
+        
 
         embed = discord.Embed(
             description = f"{user.mention} 剩**{thingy}**可活",
@@ -117,7 +118,10 @@ class Fun(Cog_Extension):
         if 75 < cute_number <= 100:
             lol = "你很可愛! ><"
             embed_color_uwu = MAIN_COLOR
-
+        if ctx.author.id == '806346991730819121':
+            lol = "你很可愛! ><"
+            embed_color_uwu = MAIN_COLOR
+            cute_number = 200
         embed = discord.Embed(
             title="可愛探測器！",
             description = f"**{user.name}#{user.discriminator}** 的可愛指數是： **{cute_number}%**!",
