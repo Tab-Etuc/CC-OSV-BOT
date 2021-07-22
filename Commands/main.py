@@ -9,11 +9,12 @@ class Main(Cog_Extension):
     @commands.cooldown(1, 10, commands.BucketType.user)
     @commands.command(aliases = ['trs'])
     async def 翻譯(self, ctx, *, message = None):
-        
+            message = message.replace(' ', '=')
             URL = f'https://www.google.com/inputtools/request?text={message}&ime=zh-hant-t-i0&cb=?'
+            
             message = requests.post(url=URL)
-            rmsg = message.json()
-            await ctx.send((rmsg[1][0][1][0]))
+            message = message.json()
+            await ctx.send((message[1][0][1][0]))
 
 
             
