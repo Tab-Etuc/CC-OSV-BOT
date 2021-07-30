@@ -6,7 +6,7 @@ from config import *
 
 
 load_dotenv()
-TOKEN2 = os.getenv("DISCORD_TOKEN")
+TOKEN = os.getenv("DISCORD_TOKEN")
 
     
 intents = discord.Intents.all() # 啟用所有 intents
@@ -18,7 +18,7 @@ bot.remove_command("help")
 @bot.event
 async def on_ready():
   await bot.change_presence(activity=discord.Game(activity))
-  print('CCBot已成功上線！')
+  print(f'{bot.user.name}已成功上線！')
     
 
 
@@ -27,4 +27,4 @@ for filename in os.listdir('./Commands'):
         bot.load_extension(f'Commands.{filename[:-3]}')
 
 if __name__ == "__main__":
-  bot.run(TOKEN2)
+  bot.run(TOKEN)

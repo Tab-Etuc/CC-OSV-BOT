@@ -17,7 +17,7 @@ class Mine_GUI():
         embed_top = discord.Embed(color=MAIN_COLOR, description="឵឵\n\n功能：")
         embed_top.set_thumbnail(url="https://cdn.discordapp.com/attachments/851788198467338242/866652093263511612/text-mining-icon-2793702_960_720.png")
         embed_top.set_author(name="水月礦場 前導介面")
-        embed_top.set_image(url="https://cdn.discordapp.com/attachments/851788198467338242/866876977717968896/stop_sign.png")
+        embed_top.set_image(url="https://cdn.discordapp.com/attachments/851788198467338242/866935632939712533/1.png")
         embed_top.set_footer(text="招募工人")
         embed_2 = discord.Embed(color=MAIN_COLOR)
         embed_2.set_image(url="https://cdn.discordapp.com/attachments/851788198467338242/866935313217355786/lk1.png")
@@ -41,6 +41,7 @@ class Miner():
             await ctx.send(
                 "如果十五秒內未收到回應，此次紀錄將被捨棄。"
             )
+            
             message = await ctx.send(f"`{Miner.print_board(board)}`")
             await message.add_reaction("1️⃣")
             await message.add_reaction("2️⃣")

@@ -465,7 +465,7 @@ class Economy(Cog_Extension):
               new_存款額度 = math.floor(存款額度*1.2 - 存款額度)
 
               if 現金+要扣的錢 < 0:
-                if int(users[1]) >= 要扣的錢: #當使用者的銀行餘額足夠升級，然現金不足
+                if int(users[1]) + 要扣的錢 >= 0: #當使用者的銀行餘額足夠升級，然現金不足
                   webhook = await ctx.channel.create_webhook(name = "CC-OSV-WebHook")
                   embed = discord.Embed(title=':warning: 錯誤！', description=f'{ctx.author.mention} 你的現金不足{-1*要扣的錢}。', color=ORANGE_COLOR)
                   await webhook.send(embed=embed, username = '˚₊ ࣪« 中央銀行 » ࣪ ˖', avatar_url = 'https://imgur.com/csEpNAa.png', allowed_mentions=discord.AllowedMentions(everyone=False, users=False, roles=False, replied_user=False),wait=True)
