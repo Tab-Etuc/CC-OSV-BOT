@@ -272,9 +272,9 @@ class Game(Cog_Extension):
 
     @commands.cooldown(1, 10, commands.BucketType.user)
     @commands.command(name='2048')
-    async def 2048(self, ctx):
+    async def _2048(self, ctx):
         """Play 2048 game"""
-        await 2048.play(ctx, self.bot)
+        await _2048.play(ctx, self.bot)
 
     @commands.cooldown(1, 10, commands.BucketType.user)
     @commands.command(aliases=["8ball","8BALL"])
