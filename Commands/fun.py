@@ -11,7 +11,7 @@ import requests
 class Fun(Cog_Extension):
 
   @commands.cooldown(1, 10, commands.BucketType.user)
-  @commands.command(aliases=['bet'.casefold(), 'whendie'.casefold()])
+  @commands.command(aliases=['whendie'.casefold()])
   async def _whendie(self, ctx, *, user: discord.Member = None):
         if user == None:
             user = ctx.author
