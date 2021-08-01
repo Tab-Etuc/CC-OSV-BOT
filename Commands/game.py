@@ -1,7 +1,7 @@
 import random
 import asyncio
 from discord.ext import commands
-from Commands.games import tictactoe, wumpus, minesweeper, 2048
+from Commands.games import tictactoe, wumpus, minesweeper, _2048
 from core.classes import Cog_Extension
 from discord import Embed
 from discord_components import DiscordComponents, Button, ButtonStyle
