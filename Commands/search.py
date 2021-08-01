@@ -55,11 +55,11 @@ def Search(search_type, ctx, arg):
 class search(Cog_Extension):
     @commands.cooldown(1, 10, commands.BucketType.user)
     @commands.command(aliases=['google'.casefold()])
-    async def google(self, ctx, arg:str=''):
+    async def _google(self, ctx, arg:str=''):
         await ctx.send(embed=Search('google', ctx, arg))
     @commands.cooldown(1, 10, commands.BucketType.user)
     @commands.command(aliases=['wiki'.casefold(), 'wikipedia'.casefold()])
-    async def wiki(self, ctx, arg:str=''):        
+    async def _wiki(self, ctx, arg:str=''):        
         await ctx.send(embed=Search('wikipedia', ctx, arg))
 
 def setup(bot):

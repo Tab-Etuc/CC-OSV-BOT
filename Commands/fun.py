@@ -12,7 +12,7 @@ class Fun(Cog_Extension):
 
   @commands.cooldown(1, 10, commands.BucketType.user)
   @commands.command(aliases=['bet'.casefold(), 'whendie'.casefold()])
-  async def whendie(self, ctx, *, user: discord.Member = None):
+  async def _whendie(self, ctx, *, user: discord.Member = None):
         if user == None:
             user = ctx.author
 
@@ -110,7 +110,7 @@ class Fun(Cog_Extension):
 
   @commands.cooldown(1, 10, commands.BucketType.user)
   @commands.command(aliases=['howcute'.casefold()])
-  async def howcute(self, ctx, user: discord.Member = None):
+  async def _howcute(self, ctx, user: discord.Member = None):
         if user == None:
             user = ctx.author
         embed = discord.Embed(
@@ -150,7 +150,7 @@ class Fun(Cog_Extension):
 
   @commands.cooldown(1, 10, commands.BucketType.user)
   @commands.command(aliases=['burn'.casefold()])
-  async def burn(self, ctx, user: discord.Member = None):
+  async def _burn(self, ctx, user: discord.Member = None):
       if user == None:
           user = ctx.author
 
@@ -171,7 +171,7 @@ class Fun(Cog_Extension):
 
   @commands.cooldown(1, 10, commands.BucketType.user)
   @commands.command(aliases=['trash'.casefold()])
-  async def trash(self, ctx, user: discord.Member = None):
+  async def _trash(self, ctx, user: discord.Member = None):
       if user == None:
           user = ctx.author
 
@@ -192,7 +192,7 @@ class Fun(Cog_Extension):
 
   @commands.cooldown(1, 10, commands.BucketType.user)
   @commands.command(aliases=['meme'.casefold()])
-  async def meme(self, ctx):
+  async def _meme(self, ctx):
         embed=discord.Embed(
             title = "哈哈!",
             color = MAIN_COLOR
@@ -208,7 +208,7 @@ class Fun(Cog_Extension):
 
   @commands.cooldown(1, 10, commands.BucketType.user)
   @commands.command(aliases=['anime'.casefold()])
-  async def anime(self, ctx):
+  async def _anime(self, ctx):
         response = requests.get("https://shiro.gg/api/images/neko")
 
         realResponse = response.json()
@@ -225,7 +225,7 @@ class Fun(Cog_Extension):
 
   @commands.cooldown(1, 10, commands.BucketType.user)
   @commands.command(aliases=['meow'.casefold(), 'cats'.casefold(), 'cat'.casefold()])
-  async def cat(self, ctx):
+  async def _cat(self, ctx):
         async with ctx.channel.typing():
             async with aiohttp.ClientSession() as cs:
                 async with cs.get("http://aws.random.cat/meow") as r:
@@ -241,7 +241,7 @@ class Fun(Cog_Extension):
 
   @commands.cooldown(1, 10, commands.BucketType.user)
   @commands.command(aliases=['dogs'.casefold(), 'dog'.casefold()])
-  async def dog(self, ctx):
+  async def _dog(self, ctx):
         async with ctx.channel.typing():
             async with aiohttp.ClientSession() as cs:
                 async with cs.get("http://random.dog/woof.json") as r:
@@ -256,7 +256,7 @@ class Fun(Cog_Extension):
 
   @commands.cooldown(1, 10, commands.BucketType.user)
   @commands.command(aliases=['fox'.casefold()])
-  async def fox(self, ctx):
+  async def _fox(self, ctx):
         url = "https://randomfox.ca/floof/"
         response = requests.get(url)
         fox = response.json()
@@ -269,7 +269,7 @@ class Fun(Cog_Extension):
 
   @commands.cooldown(1, 10, commands.BucketType.user)
   @commands.command(aliases=['panda'.casefold()])
-  async def panda(self, ctx):
+  async def _panda(self, ctx):
         url = 'https://some-random-api.ml/img/panda'
         response = requests.get(url)
         img = response.json()
@@ -282,7 +282,7 @@ class Fun(Cog_Extension):
 
   @commands.cooldown(1, 10, commands.BucketType.user)
   @commands.command(aliases=['redpanda'.casefold()])
-  async def redpanda(self, ctx):
+  async def _redpanda(self, ctx):
         url = 'https://some-random-api.ml/img/red_panda'
         response = requests.get(url)
         img = response.json()
@@ -295,7 +295,7 @@ class Fun(Cog_Extension):
 
   @commands.cooldown(1, 10, commands.BucketType.user)
   @commands.command(aliases=['pika'.casefold(), 'pikachu'.casefold()])
-  async def pikachu(self, ctx):
+  async def _pikachu(self, ctx):
         url = 'https://some-random-api.ml/img/pikachu'
         response = requests.get(url)
         img = response.json()
@@ -308,7 +308,7 @@ class Fun(Cog_Extension):
 
   @commands.cooldown(1, 10, commands.BucketType.user)
   @commands.command(aliases=['comment'.casefold() ])
-  async def comment(self, ctx, *, message=None):
+  async def _comment(self, ctx, *, message=None):
         if message == None:
             await ctx.message.reply(embed=discord.Embed(
                 title="錯誤!",
@@ -326,7 +326,7 @@ class Fun(Cog_Extension):
 
   @commands.cooldown(1, 10, commands.BucketType.user)
   @commands.command(aliases=['wasted'.casefold()])
-  async def wasted(self, ctx, user: discord.Member = None):
+  async def _wasted(self, ctx, user: discord.Member = None):
         if user == None:
             user = ctx.author
 
