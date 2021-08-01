@@ -68,19 +68,13 @@ class Event(Cog_Extension):
               role = guild.get_role(863639159461773322)
               await data.member.add_roles(role)
               await data.member.send(f"你已獲得進入CC-OSV待辦事項區之通行證。")                            
-      elif data.message_id == 837963992982880266:
-          if str(data.emoji) == '<:emoji_7:835137032300003348>': 
-              guild = self.bot.get_guild(data.guild_id)
-              role = guild.get_role(834430171171258417)
-              await data.member.add_roles(role)
-              await data.member.send(f"你已取得普通公民身分，正式進入我國國境。")
       elif data.message_id == 858138565967085649:
           if str(data.emoji) == '<a:gif1:840492057009324073>': 
               guild = self.bot.get_guild(data.guild_id)
               role = guild.get_role(837968327014875177)
               await data.member.add_roles(role)
               await data.member.send(f"你已獲大同國民黨黨籍。")
-          elif str(data.emoji) == '<a:y_star1:858132467890520064>': 
+          elif str(data.emoji) == '<a:c_star:858138565967085649>': 
               guild = self.bot.get_guild(data.guild_id)
               role = guild.get_role(860396953551634432)
               await data.member.add_roles(role)
@@ -164,7 +158,14 @@ class Event(Cog_Extension):
 
   @commands.Cog.listener()                
   async def on_raw_reaction_remove(self, data):
-      if data.message_id == 858140566268411924:
+      if data.message_id in 添加身分組:
+          if str(data.emoji) in 添加身分組[data.message_id][刪除]:
+                guild = self.bot.get_guild(data.guild_id)
+                user = await guild.fetch_member(data.user_id)
+                role = guild.get_role(837975201915994153)
+                await user.remove_roles(role)
+                await user.send(f"123。")    
+      elif data.message_id == 858140566268411924:
           if str(data.emoji) == '<:E13:837971561725952020>':
                 guild = self.bot.get_guild(data.guild_id)
                 user = await guild.fetch_member(data.user_id)
@@ -195,13 +196,6 @@ class Event(Cog_Extension):
                 role = guild.get_role(863639159461773322)
                 await user.remove_roles(role)
                 await user.send(f"你已被禁止進入紅燈區。")                                                                    
-      elif data.message_id == 837963992982880266:
-        if str(data.emoji) == '<:emoji_7:835137032300003348>':
-                guild = self.bot.get_guild(data.guild_id)
-                user = await guild.fetch_member(data.user_id)
-                role = guild.get_role(834430171171258417)
-                await user.remove_roles(role)
-                await user.send(f"你已喪失普通公民身分，被驅逐我國國境。")
       elif data.message_id == 858138565967085649:
             if str(data.emoji) == '<:gif1:840492057009324073>':
                 guild = self.bot.get_guild(data.guild_id)
@@ -209,7 +203,7 @@ class Event(Cog_Extension):
                 role = guild.get_role(837968327014875177)
                 await user.remove_roles(role)
                 await user.send(f"你已退黨。")
-            elif str(data.emoji) == '<:y_star1:858132467890520064>':
+            elif str(data.emoji) == '<:c_star:858138565967085649>':
                 guild = self.bot.get_guild(data.guild_id)
                 user = await guild.fetch_member(data.user_id)
                 role = guild.get_role(860396953551634432)

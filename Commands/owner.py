@@ -8,6 +8,7 @@ from config import *
 class Owner(Cog_Extension):
   def __init__(self, bot):
         self.regex = re.compile(r"(\w*)\s*(?:```)(\w*)?([\s\S]*)(?:```$)")
+        self.bot = bot
 
   @property
   def session(self):
@@ -92,9 +93,9 @@ class Owner(Cog_Extension):
 
         if reason is not None:
             if reason in levels.keys():
-                await ctx.send(msg=f'已清理 {num} 則訊息.\nReason: {levels[reason]}')
+                await ctx.send(f'已清理 {num} 則訊息.\nReason: {levels[reason]}')
         else:
-            await ctx.send(msg=f'已清理 {num} 則訊息.\nReason: {reason}', delete_after=5.0)
+            await ctx.send(f'已清理 {num} 則訊息.\nReason: {reason}', delete_after=5.0)
             
   @commands.command()
   @commands.has_permissions(administrator=True)

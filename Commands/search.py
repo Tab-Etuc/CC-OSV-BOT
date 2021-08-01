@@ -4,8 +4,34 @@ from discord.ext import commands
 from core.classes import Cog_Extension
 from config import *
 
-with open(r'search.json', 'r', encoding='utf8') as SearchFile:
-    SearchData = json.load(SearchFile)
+SearchData = {
+    "search_image": {
+        "google": "https://i.imgur.com/bM31b3K.png",
+        "wikipedia": "https://i.imgur.com/UMaBtez.png"
+    },
+    "search_link": {
+        "google": "http://www.google.com",
+        "wikipedia": "https://zh.wikipedia.org"
+    },
+    "search_list": [
+        "google",
+        "wikipedia"
+    ],
+    "search_name": {
+        "google": {
+            "en_name": "Google",
+            "zh_name": "谷歌"
+        },
+        "wikipedia": {
+            "en_name": "Wikipedia",
+            "zh_name": "維基百科"
+        }
+    },
+    "search_prefix": {
+        "google": "/search?q=",
+        "wikipedia": "/w/index.php?search="
+    }
+}
 
 def Search(search_type, ctx, arg):
     if search_type in SearchData['search_list']:
@@ -28,11 +54,11 @@ def Search(search_type, ctx, arg):
 
 class search(Cog_Extension):
     @commands.cooldown(1, 10, commands.BucketType.user)
-    @commands.command()
+    @commands.command(aliases=['google'.casefold()])
     async def google(self, ctx, arg:str=''):
         await ctx.send(embed=Search('google', ctx, arg))
     @commands.cooldown(1, 10, commands.BucketType.user)
-    @commands.command()
+    @commands.command(aliases=['wiki'.casefold(), 'wikipedia'.casefold()])
     async def wiki(self, ctx, arg:str=''):        
         await ctx.send(embed=Search('wikipedia', ctx, arg))
 

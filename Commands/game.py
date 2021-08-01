@@ -1,8 +1,7 @@
 import random
 import asyncio
-from discord_webhook.webhook import DiscordWebhook
 from discord.ext import commands
-from Commands.games import tictactoe, wumpus, minesweeper, twenty
+from Commands.games import tictactoe, wumpus, minesweeper, 2048
 from core.classes import Cog_Extension
 from discord import Embed
 from discord_components import DiscordComponents, Button, ButtonStyle
@@ -12,9 +11,11 @@ from config import *
 import core.economy
 import json
 
-webhook = DiscordWebhook(url=WEBHOOK_URL)  
+
+
 
 class Game(Cog_Extension):
+
     @commands.command(name="老虎機", aliases=['slots', 'bet'])
     @commands.cooldown(rate=1, per=10.0, type=commands.BucketType.user)
     async def slot(self, ctx):
@@ -33,6 +34,9 @@ class Game(Cog_Extension):
             await core.economy.update_bank(ctx.author,1000000,"現金")
         else:
             await ctx.send(f"{slotmachine} 沒有連線的，你輸了 😢")
+
+
+
     @commands.cooldown(1, 10, commands.BucketType.user)
     @commands.command(name='toss', aliases=['flip'])
     async def cointoss(self, ctx):
@@ -129,6 +133,8 @@ class Game(Cog_Extension):
             self.session_message[ctx.author.id] = msg
             await self.cointoss(ctx)
 
+
+
     @commands.cooldown(1, 10, commands.BucketType.user)
     @commands.command(name='numgame', aliases=['nungame','num', 'NUNGAME'])
     async def numgame(self, ctx):
@@ -140,6 +146,7 @@ class Game(Cog_Extension):
 
       def guess_check(m):
           return m.content.isdigit() and m.author == ctx.message.author
+          
       while guessnumber < 6:
           guessnumber = guessnumber + 1
 
@@ -177,8 +184,19 @@ class Game(Cog_Extension):
 
         answer = None
         while answer not in ('是', '否'):
-            webhook = DiscordWebhook(url=WEBHOOK_URL, content='你確定要這麼做嗎？如果你失手，那麼你所有的錢都會消失。 （是或否）')
-            webhook.execute()
+            webhook = await ctx.channel.create_webhook(name = "CC-OSV-WebHook")
+            await webhook.send(
+                    '你確定要這麼做嗎？如果你失手，那麼你所有的錢都會消失。 （是或否）', 
+                    username = '˚₊ ࣪« 中央銀行 » ࣪ ˖', 
+                    avatar_url = 'https://imgur.com/csEpNAa.png', 
+                    allowed_mentions = discord.AllowedMentions(
+                            everyone = False, 
+                            users = False, 
+                            roles = False, 
+                            replied_user = False
+                    )
+            )
+            await webhook.delete()
 
             def check(m):
                 return m.author == ctx.message.author
@@ -186,19 +204,52 @@ class Game(Cog_Extension):
             try:
                 answer = (await self.bot.wait_for('message', timeout=10.0, check=check))
             except asyncio.TimeoutError:
-                webhook = DiscordWebhook(url=WEBHOOK_URL, content='你花了太久時間回答。'); return
-                webhook.execute()              
+                webhook = await ctx.channel.create_webhook(name = "CC-OSV-WebHook")
+                await webhook.send(
+                        '你花了太久時間回答。', 
+                        username = '˚₊ ࣪« 中央銀行 » ࣪ ˖', 
+                        avatar_url = 'https://imgur.com/csEpNAa.png', 
+                        allowed_mentions = discord.AllowedMentions(
+                                everyone = False, 
+                                users = False, 
+                                roles = False, 
+                                replied_user = False
+                        )
+                )
+                await webhook.delete(); return
 
             answer = answer.content.lower()
 
             if answer == '是':
                 await ctx.send(core.economy.roulette(ctx.message.author))
-            elif answer == '否':
-                webhook = DiscordWebhook(url=WEBHOOK_URL, content='好喔= =')
-                webhook.execute()  
+            elif answer == '否':  
+                webhook = await ctx.channel.create_webhook(name = "CC-OSV-WebHook")
+                await webhook.send(
+                        '好喔= =', 
+                        username = '˚₊ ࣪« 中央銀行 » ࣪ ˖', 
+                        avatar_url = 'https://imgur.com/csEpNAa.png', 
+                        allowed_mentions = discord.AllowedMentions(
+                                everyone = False, 
+                                users = False, 
+                                roles = False, 
+                                replied_user = False
+                        )
+                )
+                await webhook.delete()
             else:
-                webhook = DiscordWebhook(url=WEBHOOK_URL, content='請輸入“是”或“否”')
-                webhook.execute()  
+                webhook = await ctx.channel.create_webhook(name = "CC-OSV-WebHook")
+                await webhook.send(
+                        '請輸入“是”或“否”', 
+                        username = '˚₊ ࣪« 中央銀行 » ࣪ ˖', 
+                        avatar_url = 'https://imgur.com/csEpNAa.png', 
+                        allowed_mentions = discord.AllowedMentions(
+                                everyone = False, 
+                                users = False, 
+                                roles = False, 
+                                replied_user = False
+                        )
+                )
+                await webhook.delete()
                 await asyncio.sleep(0.5)
 
     @commands.cooldown(1, 10, commands.BucketType.user)
@@ -221,9 +272,9 @@ class Game(Cog_Extension):
 
     @commands.cooldown(1, 10, commands.BucketType.user)
     @commands.command(name='2048')
-    async def twenty(self, ctx):
+    async def 2048(self, ctx):
         """Play 2048 game"""
-        await twenty.play(ctx, self.bot)
+        await 2048.play(ctx, self.bot)
 
     @commands.cooldown(1, 10, commands.BucketType.user)
     @commands.command(aliases=["8ball","8BALL"])

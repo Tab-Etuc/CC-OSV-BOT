@@ -3,6 +3,7 @@ from discord.ext import commands
 from config import *
 from disputils import BotEmbedPaginator, BotConfirmation, BotMultipleChoice
 from help import *
+from core.classes import Cog_Extension
 
 category_list = ""
 total_cmds = 0
@@ -11,9 +12,7 @@ Supervisor_cmds = 9
 for category in help_categories:
     total_cmds += len(category)
 
-class HelpX(commands.Cog):
-    def __init__(self, client):
-        self.client = client
+class HelpX(Cog_Extension):
 
     @commands.cooldown(1, 10, commands.BucketType.user)
     @commands.command()
@@ -117,8 +116,8 @@ class HelpX(commands.Cog):
         else:
 
             embed=discord.Embed(
-                title = "Sowwy!",
-                description = f"I wasn't able to find the command `{hmm_category}`",
+                title = "錯誤！",
+                description = f"沒有這個類別 `{hmm_category}`",
                 color = RED_COLOR
             )
 
@@ -126,5 +125,5 @@ class HelpX(commands.Cog):
 
 
 
-def setup(client):
-    client.add_cog(HelpX(client))
+def setup(bot):
+    bot.add_cog(HelpX(bot))
