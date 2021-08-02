@@ -78,7 +78,7 @@ class Main(Cog_Extension):
         def dict_key_val_reverse(D):
             # 將字典的鍵-值互換，例: {'a': 1, 'b': 2}-> {1: 'a', 2: 'b'}
             return dict(zip(D.values(), D.keys()))
-            
+
         def strConvert(s):
             restring = ""
             convertDict = dict(zip(range(33, 127), range(65281, 65375)))
@@ -93,8 +93,8 @@ class Main(Cog_Extension):
 
         if message is not None:
             message = strConvert(message)
-            message = message.replace(' ', '=')
             message = message + ' '
+            message = message.replace(' ', '=')
             URL = f'https://www.google.com/inputtools/request?text={message}&ime=zh-hant-t-i0&cb=?'
             message = requests.post(url=URL)
             message = message.json()
