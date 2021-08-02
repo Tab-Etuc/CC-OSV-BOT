@@ -75,6 +75,10 @@ class Main(Cog_Extension):
     @commands.cooldown(1, 10, commands.BucketType.user)
     @commands.command(aliases = ['trs'])
     async def 翻譯(self, ctx, *, message = None):
+        def dict_key_val_reverse(D):
+            # 將字典的鍵-值互換，例: {'a': 1, 'b': 2}-> {1: 'a', 2: 'b'}
+            return dict(zip(D.values(), D.keys()))
+            
         def strConvert(s):
             restring = ""
             convertDict = dict(zip(range(33, 127), range(65281, 65375)))
@@ -98,9 +102,7 @@ class Main(Cog_Extension):
         else:
             await ctx.send('欲翻譯之訊息不可為負')
 
-        async def dict_key_val_reverse(D):
-            # 將字典的鍵-值互換，例: {'a': 1, 'b': 2}-> {1: 'a', 2: 'b'}
-            return dict(zip(D.values(), D.keys()))
+
 
 
 
