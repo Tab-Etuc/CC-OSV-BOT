@@ -15,13 +15,13 @@ class Main(Cog_Extension):
         if location == None:
             await ctx.send("請輸入位置。用法： `Cweather <地區>`")
             return
-        async def parse_weather_data(self, data):
+        async def parse_weather_data(data):
                 data = data['main']
                 del data['humidity']
                 del data['pressure']
                 return data
 
-        def 氣象_嵌入訊息(self, data, location):
+        def 氣象_嵌入訊息(data, location):
                 location = location.title()
                 embed = discord.Embed(
                 title = f"{location} 的氣象",
@@ -53,7 +53,7 @@ class Main(Cog_Extension):
                 )
                 return embed
 
-        def error_message(self, location):
+        def error_message(location):
                 location = location.title()
                 return discord.Embed(
                 title = f":warning: 錯誤！",
