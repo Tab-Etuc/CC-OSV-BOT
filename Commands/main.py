@@ -15,7 +15,7 @@ class Main(Cog_Extension):
         if location == None:
             await ctx.send("請輸入位置。用法： `Cweather <地區>`")
             return
-        async def parse_weather_data(data):
+        def parse_weather_data(data):
                 data = data['main']
                 del data['humidity']
                 del data['pressure']
