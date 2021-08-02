@@ -5,7 +5,6 @@ import discord
 from config import *
 import googletrans
 
-client = discord.Client()
 tr = googletrans.Translator()
 DEFAULT_LANGUAGE = "zh-tw"
 
