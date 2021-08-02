@@ -34,11 +34,11 @@ class Event(Cog_Extension):
         Gloable_Data.errors_counter += 1
         error_command = '{0}_error'.format(ctx.command)
         if hasattr(Errors, error_command):  # 檢查是否有 Custom Error Handler
-        error_cmd = getattr(Errors, error_command)
-        await error_cmd(self, ctx, error)
-        return
+            error_cmd = getattr(Errors, error_command)
+            await error_cmd(self, ctx, error)
+            return
         else:  # 使用 Default Error Handler
-        await Errors.default_error(self, ctx, error)
+            await Errors.default_error(self, ctx, error)
   
 
 
