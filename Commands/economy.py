@@ -20,8 +20,8 @@ class Economy(Cog_Extension):
 
     @commands.cooldown(1, 10, commands.BucketType.user)
     @commands.guild_only()
-    @commands.command()
-    async def count(self, ctx):
+    @commands.command(aliases=['count'.casefold()])
+    async def _count(self, ctx):
       filter = {'真人':'True'}
 
       user = cursor.count_documents(filter)
@@ -43,8 +43,8 @@ class Economy(Cog_Extension):
 
     @commands.cooldown(1, 10, commands.BucketType.user)
     @commands.guild_only()
-    @commands.command()
-    async def top(self, ctx):
+    @commands.command(aliases=['top'.casefold()])
+    async def _top(self, ctx):
       data = []
       index = 1
 
@@ -104,8 +104,8 @@ class Economy(Cog_Extension):
 
 
     @commands.cooldown(1, 10, commands.BucketType.user)
-    @commands.command()
-    async def bag(self, ctx):
+    @commands.command(aliases=['bag'.casefold()])
+    async def _bag(self, ctx):
       await core.economy.open_account(ctx.author)
       users = await core.economy.get_bag_data()
 
@@ -144,8 +144,8 @@ class Economy(Cog_Extension):
 
 
     @commands.cooldown(1, 10, commands.BucketType.user)
-    @commands.command()
-    async def buy(self, ctx, item, amount = 1):
+    @commands.command(aliases=['buy'.casefold()])
+    async def _buy(self, ctx, item, amount = 1):
         await core.economy.open_account(ctx.author)
         res = await core.economy.buy_this(
           ctx.message.author,
@@ -264,8 +264,8 @@ class Economy(Cog_Extension):
 
     @commands.cooldown(1, 10, commands.BucketType.user)
     @commands.guild_only()
-    @commands.command(aliases=['rb'])
-    async def rob(self, ctx,member : discord.Member): 
+    @commands.command(aliases=['rb'.casefold(), 'rob'.casefold()])
+    async def _rob(self, ctx,member : discord.Member): 
       if member == ctx.author: #當member = 使用者本人
         webhook = await ctx.channel.create_webhook(name = "CC-OSV-WebHook")
         embed=discord.Embed(
@@ -417,9 +417,9 @@ class Economy(Cog_Extension):
 
 
     @commands.cooldown(1, 10, commands.BucketType.user)     
-    @commands.command(aliases=['p','bank','BANK','Bank','P'])
+    @commands.command(aliases=['bank'.casefold(), 'profile'.casefold(), 'p'])
     @commands.guild_only()
-    async def profile(self, ctx, regi: discord.Member = None):
+    async def _profile(self, ctx, regi: discord.Member = None):
         embed_ = await core.economy.loading(ctx)  #發送Loading訊息        
                                         
         if (regi is not None and regi.bot) or ctx.author.bot: #偵測用戶提及之(regi)是否為BOT
@@ -549,9 +549,9 @@ class Economy(Cog_Extension):
 
 
     @commands.cooldown(1, 10, commands.BucketType.user)
-    @commands.command(aliases=['PAY'])
+    @commands.command(aliases=['pay'.casefold()])
     @commands.guild_only()
-    async def pay(self, ctx,member : discord.Member,amount = None):  
+    async def _pay(self, ctx,member : discord.Member,amount = None):  
         embed_ = await core.economy.loading(ctx)  #發送Loading訊息
         await core.economy.open_bank(ctx.author)
         await core.economy.open_bank(member)
@@ -662,8 +662,8 @@ class Economy(Cog_Extension):
 
 
     @commands.cooldown(1, 10, commands.BucketType.user)
-    @commands.command()
-    async def payday(self, ctx):
+    @commands.command(aliases=['payday'.casefold()])
+    async def _payday(self, ctx):
         webhook = await ctx.channel.create_webhook(name = "CC-OSV-WebHook")
         await webhook.send(
                 f'{ctx.author.mention} 看來你是個活在過去的老人呢！我們已經有自動予以薪資的福利了。', 
@@ -681,7 +681,7 @@ class Economy(Cog_Extension):
 
 
     @commands.cooldown(1, 10, commands.BucketType.user)
-    @commands.command(aliases=['reward'])
+    @commands.command(aliases=['reward'.casefold()])
     @commands.has_permissions(administrator=True)
     async def 賞(self, ctx ,user : discord.User, *,amount= None):
         await core.economy.open_bank(user)
@@ -708,7 +708,7 @@ class Economy(Cog_Extension):
 
 
     @commands.cooldown(1, 10, commands.BucketType.user)
-    @commands.command(aliases=['amerce'])
+    @commands.command(aliases=['amerce'.casefold()])
     @commands.has_permissions(administrator=True)
     async def 罰(self, ctx, member : discord.User, *,amount= None):
         await core.economy.open_bank(member)
@@ -735,9 +735,9 @@ class Economy(Cog_Extension):
 
 
     @commands.cooldown(1, 10, commands.BucketType.user)      
-    @commands.command(aliases=['UP'])
+    @commands.command(aliases=['up'.casefold()])
     @commands.guild_only()
-    async def up(self, ctx,mode = None, mode_all = None):
+    async def _up(self, ctx,mode = None, mode_all = None):
         embed_ = await core.economy.loading(ctx)  #發送Loading訊息
 
         if mode is None: #當使用者沒有輸入欲升級之模式
@@ -1150,10 +1150,10 @@ class Economy(Cog_Extension):
 
 
 
-    @commands.command(aliases=['with'])
+    @commands.command(aliases=['with'.casefold(), 'withdraw'.casefold()])
     @commands.cooldown(1, 10, commands.BucketType.user)
     @commands.guild_only()
-    async def withdraw(self, ctx, *,amount= None):
+    async def _withdraw(self, ctx, *,amount= None):
         users = await core.economy.get_bank_data(ctx.author)
         embed_ = await core.economy.loading(ctx)  #發送Loading訊息
 
@@ -1266,10 +1266,10 @@ class Economy(Cog_Extension):
 
 
 
-    @commands.command(aliases=['dep'])
+    @commands.command(aliases=['dep'.casefold(), 'deposit'.casefold()])
     @commands.cooldown(1, 10, commands.BucketType.user)
     @commands.guild_only()
-    async def deposit(self, ctx, *,amount= None):
+    async def _deposit(self, ctx, *,amount= None):
         embed_ = await core.economy.loading(ctx)  #發送Loading訊息
 
         users = await core.economy.get_bank_data(ctx.author)
@@ -1422,10 +1422,10 @@ class Economy(Cog_Extension):
 
 
 
-    @commands.command(aliases=['SY','薪水','Salary','SALARY'])
+    @commands.command(aliases=['sy'.casefold(), 'salary'.casefold(), '薪水',])
     @commands.cooldown(1, 10, commands.BucketType.user)
     @commands.guild_only()
-    async def salary(self, ctx):
+    async def _salary(self, ctx):
         embed = discord.Embed(
             title = '🏦中央銀行•', 
             colour = discord.Colour(0x00bfff), 
@@ -1487,10 +1487,10 @@ class Economy(Cog_Extension):
 
 
 
-    @commands.command()
+    @commands.command(aliases=['shop'.casefold()])
     @commands.cooldown(1, 10, commands.BucketType.user)
     @commands.guild_only()
-    async def shop(self, ctx):
+    async def _shop(self, ctx):
         embed=discord.Embed(
             title = '簡明市廛', 
             description = '如欲購買物品請使用`Cbuy [物品名稱/物品標號] `\n\n· · - ┈┈━━ ˚ . ✿ . ˚ ━━┈┈ - · ·', 

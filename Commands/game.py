@@ -9,14 +9,14 @@ from asyncio import TimeoutError, sleep
 from random import choice
 from config import *
 import core.economy
-import json
+import discord
 
 
 
 
 class Game(Cog_Extension):
 
-    @commands.command(name="老虎機", aliases=['slots', 'bet'])
+    @commands.command(name="老虎機", aliases=['slots'.casefold(), 'bet'.casefold()])
     @commands.cooldown(rate=1, per=10.0, type=commands.BucketType.user)
     async def slot(self, ctx):
         emojis = "🍏🍎🍐🍊🍋🍌🍉🍇🍓🍈🍒🍑🥭🍍🥝🍅🥑"
@@ -38,8 +38,8 @@ class Game(Cog_Extension):
 
 
     @commands.cooldown(1, 10, commands.BucketType.user)
-    @commands.command(name='toss', aliases=['flip'])
-    async def cointoss(self, ctx):
+    @commands.command(aliases=['flip'.casefold(), 'toss'.casefold(), 'cointoss'.casefold()])
+    async def _cointoss(self, ctx):
         embed = Embed(
             color=0xF5F5F5,
             title=f"🪙 {ctx.author.name} 擲硬幣🪙",
@@ -136,8 +136,8 @@ class Game(Cog_Extension):
 
 
     @commands.cooldown(1, 10, commands.BucketType.user)
-    @commands.command(name='numgame', aliases=['nungame','num', 'NUNGAME'])
-    async def numgame(self, ctx):
+    @commands.command(aliases=['nungame'.casefold(), 'num'.casefold()])
+    async def _numgame(self, ctx):
       await core.economy.open_bank(ctx.author)
       await ctx.send('猜一個數字在壹到壹佰之間。')
 
@@ -179,8 +179,8 @@ class Game(Cog_Extension):
               break
           
     @commands.cooldown(1, 10, commands.BucketType.user)
-    @commands.command(name='roulette', aliases=['輪盤','RL'])
-    async def roulette(self, ctx):
+    @commands.command(aliases=['輪盤','rl'.casefold(), 'roulette'.casefold()])
+    async def _roulette(self, ctx):
 
         answer = None
         while answer not in ('是', '否'):

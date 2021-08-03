@@ -58,7 +58,7 @@ async def encrypt_out(ctx, convert, _input):
 class Encryption(Cog_Extension, name="加密"):
 
     @commands.cooldown(1, 10, commands.BucketType.user)     
-    @commands.group(name="編碼", aliases=["encode","ENCODE"])
+    @commands.group(name="編碼", aliases=["encode".casefold()])
     async def encode(self, ctx):
         """ 所有編碼的方法。 """
         if ctx.invoked_subcommand is None:
@@ -67,7 +67,7 @@ class Encryption(Cog_Extension, name="加密"):
 
 
     @commands.cooldown(1, 10, commands.BucketType.user)     
-    @commands.group(name="解碼", aliases=["decode","DECODE"])
+    @commands.group(name="解碼", aliases=["decode".casefold()])
     async def decode(self, ctx):
         """ 所有解碼的方法。 """
         if ctx.invoked_subcommand is None:
@@ -76,7 +76,7 @@ class Encryption(Cog_Extension, name="加密"):
 
 
     @commands.cooldown(1, 10, commands.BucketType.user)     
-    @encode.command(name="base32", aliases=["b32"])
+    @encode.command(name="base32", aliases=["b32".casefold()])
     async def encode_base32(self, ctx, *, _input: clean_content = None):
         if not _input:
             _input = await detect_file(ctx)
@@ -88,7 +88,7 @@ class Encryption(Cog_Extension, name="加密"):
 
 
     @commands.cooldown(1, 10, commands.BucketType.user)     
-    @decode.command(name="base32", aliases=["b32"])
+    @decode.command(name="base32", aliases=["b32".casefold()])
     async def decode_base32(self, ctx, *, _input: clean_content = None):
         if not _input:
             _input = await detect_file(ctx)
@@ -101,7 +101,7 @@ class Encryption(Cog_Extension, name="加密"):
 
 
     @commands.cooldown(1, 10, commands.BucketType.user)     
-    @encode.command(name="base64", aliases=["b64"])
+    @encode.command(name="base64", aliases=["b64".casefold()])
     async def encode_base64(self, ctx, *, _input: clean_content = None):
         """ Encode in base64 """
         if not _input:
@@ -114,7 +114,7 @@ class Encryption(Cog_Extension, name="加密"):
 
 
     @commands.cooldown(1, 10, commands.BucketType.user)     
-    @decode.command(name="base64", aliases=["b64"])
+    @decode.command(name="base64", aliases=["b64".casefold()])
     async def decode_base64(self, ctx, *, _input: clean_content = None):
         """ Decode in base64 """
         if not _input:
@@ -128,7 +128,7 @@ class Encryption(Cog_Extension, name="加密"):
 
 
     @commands.cooldown(1, 10, commands.BucketType.user)     
-    @encode.command(name="rot13", aliases=["r13"])
+    @encode.command(name="rot13", aliases=["r13".casefold()])
     async def encode_rot13(self, ctx, *, _input: clean_content = None):
         """ Encode in rot13 """
         if not _input:
@@ -141,7 +141,7 @@ class Encryption(Cog_Extension, name="加密"):
 
 
     @commands.cooldown(1, 10, commands.BucketType.user)     
-    @decode.command(name="rot13", aliases=["r13"])
+    @decode.command(name="rot13", aliases=["r13".casefold()])
     async def decode_rot13(self, ctx, *, _input: clean_content = None):
         """ Decode in rot13 """
         if not _input:
@@ -183,7 +183,7 @@ class Encryption(Cog_Extension, name="加密"):
 
 
     @commands.cooldown(1, 10, commands.BucketType.user)     
-    @encode.command(name="base85", aliases=["b85"])
+    @encode.command(name="base85", aliases=["b85".casefold()])
     async def encode_base85(self, ctx, *, _input: clean_content = None):
         """ Encode in base85 """
         if not _input:
@@ -197,7 +197,7 @@ class Encryption(Cog_Extension, name="加密"):
 
 
     @commands.cooldown(1, 10, commands.BucketType.user)     
-    @decode.command(name="base85", aliases=["b85"])
+    @decode.command(name="base85", aliases=["b85".casefold()])
     async def decode_base85(self, ctx, *, _input: clean_content = None):
         """ Decode in base85 """
         if not _input:
@@ -211,7 +211,7 @@ class Encryption(Cog_Extension, name="加密"):
 
 
     @commands.cooldown(1, 10, commands.BucketType.user)     
-    @encode.command(name="ascii85", aliases=["a85"])
+    @encode.command(name="ascii85", aliases=["a85".casefold()])
     async def encode_ascii85(self, ctx, *, _input: clean_content = None):
         """ Encode in ASCII85 """
         if not _input:
@@ -225,7 +225,7 @@ class Encryption(Cog_Extension, name="加密"):
 
 
     @commands.cooldown(1, 10, commands.BucketType.user)     
-    @decode.command(name="ascii85", aliases=["a85"])
+    @decode.command(name="ascii85", aliases=["a85".casefold()])
     async def decode_ascii85(self, ctx, *, _input: clean_content = None):
         """ Decode in ASCII85 """
         if not _input:

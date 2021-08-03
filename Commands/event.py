@@ -55,7 +55,15 @@ class Event(Cog_Extension):
                 await user.remove_roles(role)
                 await user.send(添加身分組[data.message_id]['訊息(加入)'])    
 
-
+    @commands.Cog.listener()
+    async def on_reaction_add(self, data):
+        if data.message_id in 添加身分組:
+            if str(data.emoji) in 添加身分組[data.message_id]['表情符號(加入)']:
+                guild = self.bot.get_guild(data.guild_id)
+                user = await guild.fetch_member(data.user_id)
+                role = guild.get_role(添加身分組[data.message_id]['Role'])
+                await user.remove_roles(role)
+                await user.send(添加身分組[data.message_id]['訊息(加入)'])    
 
     @commands.Cog.listener()                
     async def on_raw_reaction_remove(self, data):
