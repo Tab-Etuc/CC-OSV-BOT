@@ -16,7 +16,7 @@ import discord
 
 class Game(Cog_Extension):
 
-    @commands.command(name="老虎機", aliases=['slots'.casefold(), 'bet'.casefold(), slot.casefold()])
+    @commands.command(name="老虎機", aliases=['slots'.casefold(), 'bet'.casefold(), 'slot'.casefold()])
     @commands.cooldown(rate=1, per=10.0, type=commands.BucketType.user)
     async def _slot(self, ctx):
         emojis = "🍏🍎🍐🍊🍋🍌🍉🍇🍓🍈🍒🍑🥭🍍🥝🍅🥑"
