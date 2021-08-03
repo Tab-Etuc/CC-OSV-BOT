@@ -20,7 +20,11 @@ async def on_ready():
   await bot.change_presence(activity=discord.Game(activity))
   print(f'{bot.user.name}已成功上線！')
     
-
+@bot.command()
+async def test(ctx):
+   for guild in bot.guilds:
+          for member in guild.members:
+                   yield member
 
 for filename in os.listdir('./Commands'):
     if filename.endswith('.py'):
