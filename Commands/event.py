@@ -26,27 +26,24 @@ class Event(Cog_Extension):
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, data):
         if data.message_id in 添加身分組:
-          print(type(data.emoji.id))  
-          print(type(str(data.emoji.id)))
-          print(添加身分組[data.message_id]['表情符號(加入)'])
-          if str(data.emoji.id) in 添加身分組[data.message_id]['表情符號(刪除)']:
+          if str(data.emoji.id) in 添加身分組[data.message_id]['Emoji']:
                 guild = self.bot.get_guild(data.guild_id)
                 user = await guild.fetch_member(data.user_id)
-                role = guild.get_role(添加身分組[data.message_id]['Role'])
+                role = guild.get_role(int(添加身分組[data.message_id][data.emoji.id+'(role)']))
                 await user.remove_roles(role)
-                await user.send(添加身分組[data.message_id]['訊息(加入)'])    
+                await user.send(添加身分組[data.message_id][data.emoji.id+'(Message_Add)'])    
 
 
 
     @commands.Cog.listener()                
     async def on_raw_reaction_remove(self, data):
         if data.message_id in 添加身分組:
-            if str(data.emoji) in 添加身分組[data.message_id]['表情符號(刪除)']:
+            if str(data.emoji) in 添加身分組[data.message_id]['Emoji']:
                 guild = self.bot.get_guild(data.guild_id)
                 user = await guild.fetch_member(data.user_id)
-                role = guild.get_role(添加身分組[data.message_id]['Role'])
+                role = guild.get_role(int(添加身分組[data.message_id]['Role']))
                 await user.remove_roles(role)
-                await user.send(添加身分組[data.message_id]['訊息'])    
+                await user.send(添加身分組[data.message_id][data.emoji.id+'(Message_Delete)'])    
 
 
 
