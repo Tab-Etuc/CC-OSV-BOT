@@ -47,6 +47,7 @@ class Event(Cog_Extension):
         if data.message_id in 添加身分組:
           print(type(data.emoji.id))  
           print(type(str(data.emoji.id)))
+          print(data.emoji.id)
           if str(data.emoji.id) in 添加身分組[data.message_id]['表情符號(刪除)']:
                 guild = self.bot.get_guild(data.guild_id)
                 user = await guild.fetch_member(data.user_id)
