@@ -9,25 +9,6 @@ tr = googletrans.Translator()
 DEFAULT_LANGUAGE = "zh-tw"
 
 class Event(Cog_Extension):
-    
-    @commands.command()
-    @commands.cooldown(1, 10, commands.BucketType.user)
-    async def tr(self,ctx, *,message=None):
-        if ctx.message.author == self.bot.user:
-            return
-        if message is None:
-            await ctx.send("請輸入欲翻譯之文字。參見：`Ctr [文字]`")
-            return
-
-        srcArg = False			# True if source language was provided
-        dst = DEFAULT_LANGUAGE
-
-        # Generate translation, log message details, then send message
-        output = tr.translate(message, dest=dst)
-
-        emb = discord.Embed(title="翻譯文字", description=output.text, color=MAIN_COLOR)
-        await message.reply(embed=emb, mention_author=False)
-
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
         '''指令錯誤觸發事件'''
@@ -39,22 +20,23 @@ class Event(Cog_Extension):
             return
         else:  # 使用 Default Error Handler
             await Errors.default_error(self, ctx, error)
-  
-
 
 
 
     @commands.Cog.listener()
-    async def on_reaction_add(self, data):
-        print(type(data.message_id), data.message_id)  
+    async def on_raw_reaction_add(self, data):
         if data.message_id in 添加身分組:
-            print(type(data.emoji.id), data.emoji.id)  
-            if str(data.emoji) in 添加身分組[data.message_id]['表情符號(加入)']:
+          print(type(data.emoji.id))  
+          print(type(str(data.emoji.id)))
+          print(添加身分組[data.message_id]['表情符號(加入)'])
+          if str(data.emoji.id) in 添加身分組[data.message_id]['表情符號(刪除)']:
                 guild = self.bot.get_guild(data.guild_id)
                 user = await guild.fetch_member(data.user_id)
                 role = guild.get_role(添加身分組[data.message_id]['Role'])
                 await user.remove_roles(role)
                 await user.send(添加身分組[data.message_id]['訊息(加入)'])    
+
+
 
     @commands.Cog.listener()                
     async def on_raw_reaction_remove(self, data):

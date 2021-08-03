@@ -16,9 +16,9 @@ import discord
 
 class Game(Cog_Extension):
 
-    @commands.command(name="老虎機", aliases=['slots'.casefold(), 'bet'.casefold()])
+    @commands.command(name="老虎機", aliases=['slots'.casefold(), 'bet'.casefold(), slot.casefold()])
     @commands.cooldown(rate=1, per=10.0, type=commands.BucketType.user)
-    async def slot(self, ctx):
+    async def _slot(self, ctx):
         emojis = "🍏🍎🍐🍊🍋🍌🍉🍇🍓🍈🍒🍑🥭🍍🥝🍅🥑"
         a = random.choice(emojis)
         b = random.choice(emojis)
@@ -253,8 +253,8 @@ class Game(Cog_Extension):
                 await asyncio.sleep(0.5)
 
     @commands.cooldown(1, 10, commands.BucketType.user)
-    @commands.command(aliases=['DICE', 'Dice'])
-    async def dice(self, ctx, count=None):
+    @commands.command(aliases=['dice'.casefold()])
+    async def _dice(self, ctx, count=None):
         if count == None:
             await ctx.send("請輸入欲賭之骰子點數。")
             return
@@ -277,7 +277,7 @@ class Game(Cog_Extension):
         await _2048.play(ctx, self.bot)
 
     @commands.cooldown(1, 10, commands.BucketType.user)
-    @commands.command(aliases=["8ball","8BALL"])
+    @commands.command(aliases=["8ball".casefold(),])
     async def eight_ball(self, ctx, ques=""):
         """Magic 8Ball"""
         if ques=="":
@@ -291,13 +291,13 @@ class Game(Cog_Extension):
             await ctx.send(f":8ball: 說： ||{random.choice(choices)}||(<<請點開)")
 
     @commands.cooldown(1, 10, commands.BucketType.user)
-    @commands.command(name='minesweeper', aliases=['ms'])
+    @commands.command(aliases=['ms'.casefold(), 'minesweeper'.casefold()])
     async def minesweeper(self, ctx, columns = None, rows = None, bombs = None):
         await minesweeper.play(ctx, columns, rows, bombs)
         
     @commands.cooldown(1, 10, commands.BucketType.user)
-    @commands.command(name='rps', aliases=['rockpaperscissors'])
-    async def rps(self, ctx):
+    @commands.command(aliases=['rockpaperscissors'.casefold(), 'rps'.casefold()])
+    async def _rps(self, ctx):
         def check_win(p, b):
             if p=='🌑':
                 return False if b=='📄' else True
@@ -331,12 +331,12 @@ class Game(Cog_Extension):
                 await ctx.send("**我贏了 :robot:**")
 
     @commands.cooldown(1, 10, commands.BucketType.user)
-    @commands.command(name='tictactoe', aliases=['ttt'])
-    async def ttt(self, ctx):
+    @commands.command(aliases=['ttt'.casefold(), 'tictactoe'.casefold()])
+    async def _ttt(self, ctx):
         await tictactoe.play_game(self.bot, ctx, chance_for_error=0.2) # Win Plausible
 
     @commands.cooldown(1, 10, commands.BucketType.user)
-    @commands.command(name='wumpus', aliases=['WUMPUS', 'Wumpus'])
+    @commands.command(aliases=['wumpus'.casefold()])
     async def _wumpus(self, ctx):
         await wumpus.play(self.bot, ctx)
 
