@@ -292,7 +292,7 @@ class Game(Cog_Extension):
 
     @commands.cooldown(1, 10, commands.BucketType.user)
     @commands.command(aliases=['ms'.casefold(), 'minesweeper'.casefold()])
-    async def minesweeper(self, ctx, columns = None, rows = None, bombs = None):
+    async def _minesweeper(self, ctx, columns = None, rows = None, bombs = None):
         await minesweeper.play(ctx, columns, rows, bombs)
         
     @commands.cooldown(1, 10, commands.BucketType.user)
