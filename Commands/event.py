@@ -51,7 +51,7 @@ class Event(Cog_Extension):
            elif str(data.emoji) =='🍔':
                 guild = self.bot.get_guild(data.guild_id)
                 user = await guild.fetch_member(data.user_id)
-                role = guild.get_role(837975201915994153)
+                role = guild.get_role(863630245630443551)
                 await user.add_roles(role)
                 await user.send('您已獲得進入晚餐揪揪群之通行證。')                        
 
@@ -84,7 +84,7 @@ class Event(Cog_Extension):
            elif str(data.emoji) =='🍔':
                 guild = self.bot.get_guild(data.guild_id)
                 user = await guild.fetch_member(data.user_id)
-                role = guild.get_role(837975201915994153)
+                role = guild.get_role(863630245630443551)
                 await user.remove_roles(role)
                 await user.send('您已被禁止進入晚餐揪揪群。')          
 
