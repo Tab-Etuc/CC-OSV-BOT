@@ -32,7 +32,25 @@ class Event(Cog_Extension):
                 role = guild.get_role(int(添加身分組[data.message_id][str(data.emoji.id)+'(role)']))
                 await user.add_roles(role)
                 await user.send(添加身分組[data.message_id][str(data.emoji.id) +'(Message_Add)'])    
-
+        elif data.message_id == 858140566268411924:
+           if str(data.emoji) =='🌻':
+                guild = self.bot.get_guild(data.guild_id)
+                user = await guild.fetch_member(data.user_id)
+                role = guild.get_role(863628692802240522)
+                await user.add_roles(role)
+                await user.send('您已被禁止進入墓園。')    
+           elif str(data.emoji) =='🆙':
+                guild = self.bot.get_guild(data.guild_id)
+                user = await guild.fetch_member(data.user_id)
+                role = guild.get_role(863629520719839242)
+                await user.add_roles(role)
+                await user.send('您已被禁止進入練等專區。')                    
+           elif str(data.emoji) =='🍔':
+                guild = self.bot.get_guild(data.guild_id)
+                user = await guild.fetch_member(data.user_id)
+                role = guild.get_role(837975201915994153)
+                await user.add_roles(role)
+                await user.send('您已被禁止進入晚餐揪揪群。')                        
 
 
     @commands.Cog.listener()                
