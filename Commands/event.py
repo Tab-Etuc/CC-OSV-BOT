@@ -38,7 +38,7 @@ class Event(Cog_Extension):
     @commands.Cog.listener()                
     async def on_raw_reaction_remove(self, data):
         if data.message_id in 添加身分組:
-            if str(data.emoji) in 添加身分組[data.message_id][str(data.emoji.id)+'Emoji']:
+            if str(data.emoji.id) in 添加身分組[data.message_id][str(data.emoji.id)+'Emoji']:
                 guild = self.bot.get_guild(data.guild_id)
                 user = await guild.fetch_member(data.user_id)
                 role = guild.get_role(int(添加身分組[data.message_id][str(data.emoji.id)+'Role']))
