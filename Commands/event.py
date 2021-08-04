@@ -41,7 +41,7 @@ class Event(Cog_Extension):
             if str(data.emoji.id) in 添加身分組[data.message_id][str(data.emoji.id)+'Emoji']:
                 guild = self.bot.get_guild(data.guild_id)
                 user = await guild.fetch_member(data.user_id)
-                role = guild.get_role(int(添加身分組[data.message_id][str(data.emoji.id)+'Role']))
+                role = guild.get_role(int(添加身分組[data.message_id][str(data.emoji.id)+'(role)']))
                 await user.remove_roles(role)
                 await user.send(添加身分組[data.message_id][str(data.emoji.id)+'(Message_Delete)'])    
 
