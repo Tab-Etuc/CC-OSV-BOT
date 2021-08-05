@@ -27,6 +27,7 @@ class Event(Cog_Extension):
     async def on_raw_reaction_add(self, data):
       try:   
         if data.message_id in 添加身分組:
+          print(data.emoji.id)
           if str(data.emoji.id) in 添加身分組[data.message_id][str(data.emoji.id)+'Emoji']:
                 guild = self.bot.get_guild(data.guild_id)
                 user = await guild.fetch_member(data.user_id)
