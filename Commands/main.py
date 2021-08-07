@@ -184,7 +184,7 @@ class Main(Cog_Extension):
 
     @commands.cooldown(1, 10, commands.BucketType.user)
     @commands.command(aliases=['embed'.casefold()])
-    async def embed(self, ctx, *, arg=None):
+    async def _embed(self, ctx, *, arg=None):
         async def send_error_msg():
             await ctx.send("無效args！正確的用法是 `Cembed <#hexcolor> , <標題> , <內容>`")
 
