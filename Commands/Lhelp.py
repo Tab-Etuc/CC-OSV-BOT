@@ -8,8 +8,8 @@ from Core.classes import Cog_Extension
 class Lhelp(Cog_Extension):
 
     # Help Command
-    @commands.command(aliase="h")
-    async def help(self, ctx):
+    @commands.command(aliase="lh")
+    async def lhelp(self, ctx):
             home = discord.Embed(title=":book: Help Journal | Home",
                                   description=f"Welcome to the Help Journal. My Prefix here is: `{Prefix}`\n\nThe Help Journal will give you information on all available commands and any other information.\n\n***REACT BELOW TO SWITCH PAGES*** ")
             rank = discord.Embed(title=":book: Help Journal | Rank",
