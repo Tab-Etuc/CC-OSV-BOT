@@ -1,4 +1,4 @@
-import discord, os, asyncio, random, Core.economy, Core.Miner
+import discord, os, asyncio, random, Core.economy, Core.miner
 from discord.ext import commands
 from Core.classes import Cog_Extension
 from config import *
