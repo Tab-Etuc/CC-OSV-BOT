@@ -18,29 +18,6 @@ class Gloable_Data:
         ...
 
 
-class Global_Func():
-    """自定義常用功能"""
-
-    def update_jdata(self, key, data, type='default', mode='update'):
-        '''
-        更新 Jdata 功能
-        type: default / list
-        mode: update / delete
-        '''
-        with open('bot.json', 'r', encoding='utf8') as jfile:
-            jdata = json.load(jfile)
-            if mode == 'update':
-                if type == 'default':
-                    jdata[key] = data
-                elif type == 'list':
-                    jdata[key].append(data)
-            elif mode == 'delete':
-                if type == 'list':
-                    jdata[key].remove(data)
-                
-        with open('CCbot.json', 'w', encoding='utf8') as jfile:
-            json.dump(jdata, jfile, indent=4, ensure_ascii=False)
-    
 
 class Logger:
     def log(self, ctx, data, type='error'):

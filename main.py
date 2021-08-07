@@ -7,15 +7,13 @@ from itertools import cycle
 
 
 load_dotenv()
-TOKEN = os.getenv("DISCORD_TOKEN")
 
 
-intents = discord.Intents.all() # 啟用所有 intents
 activity = discord.Game('[C] | Chelp 以資查詢')
 bot = commands.Bot(
     command_prefix = Prefix, 
     owner_ids = Owner_id, 
-    intents = intents
+    intents = discord.Intents.all()
 )
 bot.remove_command("help")
 status = cycle([
@@ -26,9 +24,9 @@ status = cycle([
 
 @bot.event
 async def on_ready():
-  await bot.change_presence(activity=discord.Game(activity))
   print(f'{bot.user.name}已成功上線！')
-    
+  status_swap.start()
+  
 @tasks.loop(seconds=10)
 async def status_swap():
   await bot.change_presence(
@@ -41,6 +39,7 @@ async def status_swap():
 for filename in os.listdir('./Commands'):
     if filename.endswith('.py'):
         bot.load_extension(f'Commands.{filename[:-3]}')
+bot.load_extension("Systems.levelsys")
 
 if __name__ == "__main__":
-  bot.run(TOKEN)
+  bot.run(os.getenv("DISCORD_TOKEN"))

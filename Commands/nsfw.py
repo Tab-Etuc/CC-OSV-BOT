@@ -3,13 +3,13 @@ import requests
 from discord.ext.commands import cooldown
 from discord.ext import commands
 
-from core.classes import Cog_Extension
+from Core.classes import Cog_Extension
 from config import *
 class NSFW(Cog_Extension):
 
     @commands.cooldown(1, 10, commands.BucketType.user)
-    @commands.command()
-    async def hentai(self, ctx):
+    @commands.command(aliases=['hentai'.casefold()])
+    async def _hentai(self, ctx):
         if ctx.channel.id == 768722875972452352:
             await ctx.send("No.")
             return
@@ -29,8 +29,8 @@ class NSFW(Cog_Extension):
             await ctx.message.reply("這個指令只能用在NSFW頻道。")
 
     @commands.cooldown(1, 10, commands.BucketType.user)
-    @commands.command()
-    async def thighs(self, ctx):
+    @commands.command(aliases=['thighs'.casefold()])
+    async def _thighs(self, ctx):
         if ctx.channel.id == 768722875972452352:
             await ctx.send("No.")
             return
@@ -50,8 +50,8 @@ class NSFW(Cog_Extension):
             await ctx.message.reply("這個指令只能用在NSFW頻道。")
 
     @commands.cooldown(1, 10, commands.BucketType.user)
-    @commands.command()
-    async def nekogif(self, ctx):
+    @commands.command(aliases=['nekogif'.casefold()])
+    async def _nekogif(self, ctx):
         if ctx.channel.id == 768722875972452352:
             await ctx.send("No.")
             return

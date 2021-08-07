@@ -1,4 +1,4 @@
-from core.classes import Cog_Extension
+from Core.classes import Cog_Extension
 import asyncio, os
 from pymongo import MongoClient
 from datetime import datetime, timezone, timedelta

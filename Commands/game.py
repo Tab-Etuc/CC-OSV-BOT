@@ -2,13 +2,13 @@ import random
 import asyncio
 from discord.ext import commands
 from Commands.games import tictactoe, wumpus, minesweeper, _2048
-from core.classes import Cog_Extension
+from Core.classes import Cog_Extension
 from discord import Embed
 from discord_components import DiscordComponents, Button, ButtonStyle
 from asyncio import TimeoutError, sleep
 from random import choice
 from config import *
-import core.economy
+import Core.economy
 import discord
 
 
@@ -28,10 +28,10 @@ class Game(Cog_Extension):
 
         if a == b == c:
             await ctx.send(f"{slotmachine} 一連線，你贏了！你賺到了**100,000,000元簡明幣** 🎉")
-            await core.economy.update_bank(ctx.author,100000000,"現金")
+            await Core.economy.update_bank(ctx.author,100000000,"現金")
         elif (a == b) or (a == c) or (b == c):
             await ctx.send(f"{slotmachine} 二連線，你贏了！🎉 你賺到了**1,000,000元簡明幣**")
-            await core.economy.update_bank(ctx.author,1000000,"現金")
+            await Core.economy.update_bank(ctx.author,1000000,"現金")
         else:
             await ctx.send(f"{slotmachine} 沒有連線的，你輸了 😢")
 
@@ -107,7 +107,7 @@ class Game(Cog_Extension):
                 title=f"🪙 {ctx.author.name}擲硬幣 🪙",
                 description=f"你選擇了 **{res.component.label.lower()}**!\n\n> **你贏了！**你賺到了100,000簡明幣。",
             )
-            await core.economy.update_bank(ctx.author,100000,"現金")
+            await Core.economy.update_bank(ctx.author,100000,"現金")
         else:
             embed = Embed(
                 color=0xED564E,
@@ -138,7 +138,7 @@ class Game(Cog_Extension):
     @commands.cooldown(1, 10, commands.BucketType.user)
     @commands.command(aliases=['nungame'.casefold(), 'num'.casefold()])
     async def _numgame(self, ctx):
-      await core.economy.open_bank(ctx.author)
+      await Core.economy.open_bank(ctx.author)
       await ctx.send('猜一個數字在壹到壹佰之間。')
 
       answer = random.randint(1, 100)
@@ -162,7 +162,7 @@ class Game(Cog_Extension):
 
                   fmt = "你答對了！你僅猜測了{}個答案。作為獎勵，你得到{}簡明幣"
                   a = reward[guessnumber]
-                  await core.economy.update_bank(ctx.author,a)
+                  await Core.economy.update_bank(ctx.author,a)
                   await ctx.send(fmt.format(guessnumber,a)) 
                   
               if guessnumber != 6:
@@ -221,7 +221,7 @@ class Game(Cog_Extension):
             answer = answer.content.lower()
 
             if answer == '是':
-                await ctx.send(core.economy.roulette(ctx.message.author))
+                await ctx.send(Core.economy.roulette(ctx.message.author))
             elif answer == '否':  
                 webhook = await ctx.channel.create_webhook(name = "CC-OSV-WebHook")
                 await webhook.send(
@@ -266,7 +266,7 @@ class Game(Cog_Extension):
             num = random.randint(1, 6)
             if num == count:
                 await ctx.send(f'骰出的數字為`{num}`，你贏了！你獲得了1,000,000元簡明幣')
-                await core.economy.update_bank(ctx.author,1000000)
+                await Core.economy.update_bank(ctx.author,1000000)
             else:
                 await ctx.send(f'骰出的數字為`{num}`,你輸了！')
 
@@ -326,7 +326,7 @@ class Game(Cog_Extension):
                 await ctx.send("**平手！:ribbon:**")
             elif check_win(str(reaction.emoji), bot_emoji):
                 await ctx.send("**你贏了 :sparkles:**你獲得了10,000,000！")
-                await core.economy.update_bank(ctx.author,10000000)
+                await Core.economy.update_bank(ctx.author,10000000)
             else:
                 await ctx.send("**我贏了 :robot:**")
 

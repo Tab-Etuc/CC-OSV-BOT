@@ -1,4 +1,4 @@
-from core.classes import Cog_Extension
+from Core.classes import Cog_Extension
 import discord
 from discord.ext import commands
 from PIL import Image, ImageFont, ImageDraw

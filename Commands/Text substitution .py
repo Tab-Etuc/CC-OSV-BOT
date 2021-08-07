@@ -1,7 +1,7 @@
 import discord
 from discord import utils
 from discord.ext import commands
-from core.classes import Cog_Extension
+from Core.classes import Cog_Extension
 
 
 class Text(Cog_Extension):

@@ -1,6 +1,6 @@
 import discord
 from discord.ext import commands
-from core.classes import Cog_Extension
+from Core.classes import Cog_Extension
 import datetime, psutil, requests, json , os
 from config import *
 import requests
@@ -9,9 +9,9 @@ import requests
 
 class Main(Cog_Extension):
 
-    @commands.command()
+    @commands.command(aliases=['weather'.casefold()])
     @commands.cooldown(1, 10, commands.BucketType.user)
-    async def weather(self, ctx, *, location = None):
+    async def _weather(self, ctx, *, location = None):
         if location == None:
             await ctx.send("請輸入位置。用法： `Cweather <地區>`")
             return
@@ -73,7 +73,7 @@ class Main(Cog_Extension):
 
 
     @commands.cooldown(1, 10, commands.BucketType.user)
-    @commands.command(aliases = ['trs'])
+    @commands.command(aliases=['FTR'.casefold()])
     async def 翻譯(self, ctx, *, message = None):
         def dict_key_val_reverse(D):
             # 將字典的鍵-值互換，例: {'a': 1, 'b': 2}-> {1: 'a', 2: 'b'}
@@ -107,8 +107,8 @@ class Main(Cog_Extension):
 
 
     @commands.cooldown(1, 10, commands.BucketType.user)
-    @commands.command(aliases = ['covid-19', 'covid19','COVID'])
-    async def covid(self, ctx, *, countryName = None):
+    @commands.command(aliases=['covid'.casefold(), 'covid19'.casefold(), 'covid-19'.casefold()])
+    async def _covid(self, ctx, *, countryName = None):
         try:
             if countryName is None:
                 await ctx.send(f"你沒有輸入國家/地區名稱，請參照 - `Ccovid [country]` ")
@@ -183,7 +183,7 @@ class Main(Cog_Extension):
             await ctx.send("無效的國家/地區名稱或 API 錯誤。 請再試一次。")
 
     @commands.cooldown(1, 10, commands.BucketType.user)
-    @commands.command()
+    @commands.command(aliases=['embed'.casefold()])
     async def embed(self, ctx, *, arg=None):
         async def send_error_msg():
             await ctx.send("無效args！正確的用法是 `Cembed <#hexcolor> , <標題> , <內容>`")
@@ -217,15 +217,15 @@ class Main(Cog_Extension):
 
 
     @commands.cooldown(1, 10, commands.BucketType.user)
-    @commands.command(aliases=['WHO', 'Who'])
-    async def who(self, ctx):
+    @commands.command(aliases=['who'.casefold()])
+    async def _who(self, ctx):
       await ctx.send("你是**{}**！".format(ctx.message.author))
 
 
 
     @commands.cooldown(1, 10, commands.BucketType.user)
-    @commands.command(aliases=['msg','MSG'])
-    async def messages(self, ctx):
+    @commands.command(aliases=['message'.casefold(), 'msg'.casefold()])
+    async def _messages(self, ctx):
         await ctx.send('正在計算訊息...')
         counter = 0
         counter2 = 0
@@ -241,8 +241,8 @@ class Main(Cog_Extension):
 
 
     @commands.cooldown(1, 10, commands.BucketType.user)
-    @commands.command(aliases=['python', 'botinfo','BOT'])
-    async def bot(self, ctx):
+    @commands.command(aliases=['python'.casefold(), 'botinfo'.casefold(), 'bot'.casefold()])
+    async def _bot(self, ctx):
         values = psutil.virtual_memory()
         val2 = values.available * 0.001
         val3 = val2 * 0.001
@@ -282,8 +282,8 @@ class Main(Cog_Extension):
 
 
     @commands.cooldown(1, 10, commands.BucketType.user)
-    @commands.command(name='sinfo', aliases=['server'])
-    async def serverinfo(self, ctx, *, name:str = ""):
+    @commands.command(aliases=['server'.casefold(), 'serverinfo'.casefold()])
+    async def _serverinfo(self, ctx, *, name:str = ""):
         if name:
             server = None
             try:
@@ -367,15 +367,15 @@ class Main(Cog_Extension):
 
 
     @commands.cooldown(1, 10, commands.BucketType.user)
-    @commands.command(aliases=['Ping', 'PING'])
-    async def ping(self, ctx):
+    @commands.command(aliases=['ping'.casefold()])
+    async def _ping(self, ctx):
         ping = abs(
                 int(
                     self.bot.latency*1000
                 )
         )
         embed=discord.Embed(
-                title = f'{ping}(ms)', 
+                title = f'`{ping}(ms)`', 
                 color = 0x73ff00, 
                 timestamp = datetime.datetime.now(
                         datetime.timezone.utc
@@ -388,8 +388,8 @@ class Main(Cog_Extension):
 
 
     @commands.cooldown(1, 10, commands.BucketType.user)
-    @commands.command(aliases=['NITRO', 'nitro'])
-    async def Nitro(self, ctx):
+    @commands.command(aliases=['nitro'.casefold()])
+    async def _Nitro(self, ctx):
         await ctx.message.delete()
         embed=discord.Embed(
                     title = '**Nitro Classic**', 

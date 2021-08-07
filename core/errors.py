@@ -1,6 +1,6 @@
 from discord.ext import commands
 import discord
-from core.classes import Logger
+from Core.classes import Logger
 from config import *
 
 class Errors():
@@ -30,10 +30,6 @@ class Errors():
     elif "403 Forbidden" in str(error): 
       await ctx.send("403 Forbidden，請檢查 Bot 權限")
       Logger.log(self, ctx, error)
-    elif "is not found" in str(error):
-        pass
-    elif "error code: 50006" in str(error):
-      pass
     elif "TypeError: object NoneType can't be used in 'await'" in str(error):
       pass
     elif "404 Not Found (error code: 10008): " in str(error):

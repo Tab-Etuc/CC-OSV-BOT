@@ -3,10 +3,10 @@ import discord
 from discord.ext import commands
 import os, random, math, time, datetime, asyncio
 from pymongo import MongoClient
-from core.classes import Cog_Extension
-import core.economy
+from Core.classes import Cog_Extension
+import Core.economy
 from config import *
-from core.economy import *
+from Core.economy import *
 import requests
 
 
@@ -106,8 +106,8 @@ class Economy(Cog_Extension):
     @commands.cooldown(1, 10, commands.BucketType.user)
     @commands.command(aliases=['bag'.casefold()])
     async def _bag(self, ctx):
-      await core.economy.open_account(ctx.author)
-      users = await core.economy.get_bag_data()
+      await Core.economy.open_account(ctx.author)
+      users = await Core.economy.get_bag_data()
 
       try:
           bag = users[str(ctx.author.id)]['bag']
@@ -146,8 +146,8 @@ class Economy(Cog_Extension):
     @commands.cooldown(1, 10, commands.BucketType.user)
     @commands.command(aliases=['buy'.casefold()])
     async def _buy(self, ctx, item, amount = 1):
-        await core.economy.open_account(ctx.author)
-        res = await core.economy.buy_this(
+        await Core.economy.open_account(ctx.author)
+        res = await Core.economy.buy_this(
           ctx.message.author,
           item,
           amount,
@@ -286,12 +286,12 @@ class Economy(Cog_Extension):
         )
         await webhook.delete(); return
 
-      embed_ = await core.economy.loading(ctx)  #發送Loading訊息
+      embed_ = await Core.economy.loading(ctx)  #發送Loading訊息
       
-      await core.economy.open_bank(ctx.author)
-      await core.economy.open_bank(member)
-      bal = await core.economy.get_bank_data(member)
-      data = await core.economy.get_bank_data(ctx.author)
+      await Core.economy.open_bank(ctx.author)
+      await Core.economy.open_bank(member)
+      bal = await Core.economy.get_bank_data(member)
+      data = await Core.economy.get_bank_data(ctx.author)
       timeleft = int(time.time()-data[8])
       timeleft = 86400 - timeleft
 
@@ -353,9 +353,9 @@ class Economy(Cog_Extension):
 
       earning = random.randrange(0, bal[0])
 
-      await core.economy.update_bank(ctx.author, earning)
-      await core.economy.update_bank(member, -1*earning)
-      await core.economy.update_set_bank(ctx.author, data[8], 'Rob')
+      await Core.economy.update_bank(ctx.author, earning)
+      await Core.economy.update_bank(member, -1*earning)
+      await Core.economy.update_set_bank(ctx.author, data[8], 'Rob')
       webhook = await ctx.channel.create_webhook(name = "CC-OSV-WebHook")
       embed=discord.Embed(
           title = '<a:V_:858154997640331274> 成功執行！',
@@ -383,8 +383,8 @@ class Economy(Cog_Extension):
     @commands.command()
     @commands.guild_only()
     async def 國庫(self, ctx):
-      embed_ = await core.economy.loading(ctx)  #發送Loading訊息
-      users = await core.economy.get_國庫()
+      embed_ = await Core.economy.loading(ctx)  #發送Loading訊息
+      users = await Core.economy.get_國庫()
 
       embed = discord.Embed(
           title = '國庫'
@@ -420,7 +420,7 @@ class Economy(Cog_Extension):
     @commands.command(aliases=['bank'.casefold(), 'profile'.casefold(), 'p'])
     @commands.guild_only()
     async def _profile(self, ctx, regi: discord.Member = None):
-        embed_ = await core.economy.loading(ctx)  #發送Loading訊息        
+        embed_ = await Core.economy.loading(ctx)  #發送Loading訊息        
                                         
         if (regi is not None and regi.bot) or ctx.author.bot: #偵測用戶提及之(regi)是否為BOT
             webhook = await ctx.channel.create_webhook(name = "CC-OSV-WebHook")
@@ -445,10 +445,10 @@ class Economy(Cog_Extension):
             await embed_[1].delete(); return #刪除先前創建之Webhook
 
         elif not regi: #沒有提及人，即查看自己
-                await core.economy.open_bank(ctx.author)
-                users = await core.economy.get_bank_data(ctx.author)
-                利息等階_data = await core.economy.利息_data(int(users[7]))
-                存額等階_data = await core.economy.存額_data(int(users[6]))
+                await Core.economy.open_bank(ctx.author)
+                users = await Core.economy.get_bank_data(ctx.author)
+                利息等階_data = await Core.economy.利息_data(int(users[7]))
+                存額等階_data = await Core.economy.存額_data(int(users[6]))
 
                 embed = discord.Embed(
                         title = '一般用戶', 
@@ -496,10 +496,10 @@ class Economy(Cog_Extension):
                 await embed_[1].delete(); return #刪除先前創建之Webhook
     
         elif regi is not None: #有提及人
-            await core.economy.open_bank(regi)
-            regi1 = await core.economy.get_bank_data(regi)
-            利息_data = await core.economy.利息_data(int(regi1[7]) )
-            存額_data = await core.economy.存額_data(int(regi1[6]))
+            await Core.economy.open_bank(regi)
+            regi1 = await Core.economy.get_bank_data(regi)
+            利息_data = await Core.economy.利息_data(int(regi1[7]) )
+            存額_data = await Core.economy.存額_data(int(regi1[6]))
             
             embed = discord.Embed(
                     title = '一般用戶', 
@@ -552,9 +552,9 @@ class Economy(Cog_Extension):
     @commands.command(aliases=['pay'.casefold()])
     @commands.guild_only()
     async def _pay(self, ctx,member : discord.Member,amount = None):  
-        embed_ = await core.economy.loading(ctx)  #發送Loading訊息
-        await core.economy.open_bank(ctx.author)
-        await core.economy.open_bank(member)
+        embed_ = await Core.economy.loading(ctx)  #發送Loading訊息
+        await Core.economy.open_bank(ctx.author)
+        await Core.economy.open_bank(member)
 
         if amount == None: #未輸入金額
             embed=discord.Embed(title=':warning: 錯誤！', description=f'{ctx.author.mention} 請輸入金額。', color=ORANGE_COLOR)
@@ -574,8 +574,8 @@ class Economy(Cog_Extension):
             await embed_[0].delete() #刪除loading訊息
             await embed_[1].delete(); return #刪除先前創建之Webhook
 
-        bal = await core.economy.get_bank_data(ctx.author)
-        member_bal = await core.economy.get_bank_data(member)
+        bal = await Core.economy.get_bank_data(ctx.author)
+        member_bal = await Core.economy.get_bank_data(member)
 
         if amount == 'all':
             amount = bal[1]
@@ -639,8 +639,8 @@ class Economy(Cog_Extension):
             await embed_[0].delete() #刪除loading訊息
             await embed_[1].delete(); return #刪除先前創建之Webhook
 
-        await core.economy.update_bank(ctx.author,-1*amount,'銀行餘額')
-        await core.economy.update_bank(member,amount,'銀行餘額')
+        await Core.economy.update_bank(ctx.author,-1*amount,'銀行餘額')
+        await Core.economy.update_bank(member,amount,'銀行餘額')
         embed=discord.Embed(title='<a:V_:858154997640331274> 成功執行！', description=f'{ctx.author.mention} 給了 {member} {amount} 元簡明幣。', color=MAIN_COLOR)
         webhook = await ctx.channel.create_webhook(name = "CC-OSV-WebHook")
 
@@ -684,8 +684,8 @@ class Economy(Cog_Extension):
     @commands.command(aliases=['reward'.casefold()])
     @commands.has_permissions(administrator=True)
     async def 賞(self, ctx ,user : discord.User, *,amount= None):
-        await core.economy.open_bank(user)
-        await core.economy.update_bank(user, int(amount), '現金')
+        await Core.economy.open_bank(user)
+        await Core.economy.update_bank(user, int(amount), '現金')
         embed = discord.Embed(
                 title = '<a:V_:858154997640331274> 成功執行！', 
                 description = f'{ctx.author.mention} 給了 {user} {amount} 元簡明幣。', 
@@ -711,8 +711,8 @@ class Economy(Cog_Extension):
     @commands.command(aliases=['amerce'.casefold()])
     @commands.has_permissions(administrator=True)
     async def 罰(self, ctx, member : discord.User, *,amount= None):
-        await core.economy.open_bank(member)
-        await core.economy.update_bank(member, int(-1*amount), '現金')
+        await Core.economy.open_bank(member)
+        await Core.economy.update_bank(member, int(-1*amount), '現金')
         embed=discord.Embed(
                 title = '成功執行！', 
                 description = f'{ctx.author.mention} 罰了 {member} {amount} 元簡明幣。', 
@@ -738,7 +738,7 @@ class Economy(Cog_Extension):
     @commands.command(aliases=['up'.casefold()])
     @commands.guild_only()
     async def _up(self, ctx,mode = None, mode_all = None):
-        embed_ = await core.economy.loading(ctx)  #發送Loading訊息
+        embed_ = await Core.economy.loading(ctx)  #發送Loading訊息
 
         if mode is None: #當使用者沒有輸入欲升級之模式
             embed = discord.Embed(
@@ -765,7 +765,7 @@ class Economy(Cog_Extension):
         if mode == '存額' or mode == '存款額度' or mode == '銀行存額': #當模式為存額 or 近似之文字
             if mode_all is not None: #當使用者於mode_all 格 有輸入文字
                 if mode_all.lower() == 'all' or mode_all.lower() == 'max': #當上述文字為[ all / max ]
-                    users = await core.economy.get_bank_data(ctx.author)
+                    users = await Core.economy.get_bank_data(ctx.author)
                     存款額度 = int(users[4])
                     銀行等階 = int(users[6])
                     現金 = int(users[0])
@@ -820,22 +820,22 @@ class Economy(Cog_Extension):
                         存款額度 += math.floor(存款額度*1.2)
                         現金 += 扣錢  
 
-                    await core.economy.update_set_bank(
+                    await Core.economy.update_set_bank(
                             ctx.author, 
                             現金
                     )
-                    await core.economy.update_set_bank(
+                    await Core.economy.update_set_bank(
                             ctx.author, 
                             存款額度, 
                             '存款額度'
                     )
-                    await core.economy.update_set_bank(
+                    await Core.economy.update_set_bank(
                             ctx.author, 
                             銀行等階, 
                             '銀行等階'
                     )
-                    users = await core.economy.get_bank_data(ctx.author)
-                    存額等階_data = await core.economy.存額_data(int(users[6]))
+                    users = await Core.economy.get_bank_data(ctx.author)
+                    存額等階_data = await Core.economy.存額_data(int(users[6]))
                     webhook = await ctx.channel.create_webhook(name = "CC-OSV-WebHook")
                     embed=discord.Embed(
                             title = '<a:V_:858154997640331274> 成功執行！', 
@@ -876,7 +876,7 @@ class Economy(Cog_Extension):
                     await embed_[1].delete() #刪除先前創建之Webhook
 
             else: #當使用者僅輸入Cup 存額
-                users = await core.economy.get_bank_data(ctx.author)
+                users = await Core.economy.get_bank_data(ctx.author)
                 存款額度 = int(users[4])
                 銀行等階 = int(users[6])
                 現金 = int(users[0])
@@ -920,26 +920,26 @@ class Economy(Cog_Extension):
                                     )
 
                                     if str(reaction.emoji) == "<a:V_:858154997640331274>": #當使用者點擊表情符號
-                                        embed_ = await core.economy.loading(ctx)  #發送Loading訊息
+                                        embed_ = await Core.economy.loading(ctx)  #發送Loading訊息
                                         await message.remove_reaction(
                                             reaction, 
                                             user
                                         )       
 
-                                        存額等階_data = await core.economy.存額_data(銀行等階)
+                                        存額等階_data = await Core.economy.存額_data(銀行等階)
                                         銀行等階圖示 = 存額等階_data[0]      
 
-                                        await core.economy.update_bank(
+                                        await Core.economy.update_bank(
                                                 ctx.author, 
                                                 要扣的錢, 
                                                 '銀行餘額'
                                         )
-                                        await core.economy.update_bank(
+                                        await Core.economy.update_bank(
                                                 ctx.author, 
                                                 new_存款額度 , 
                                                 '存款額度'
                                         )
-                                        await core.economy.update_bank(
+                                        await Core.economy.update_bank(
                                                 ctx.author, 
                                                 1, '銀行等階'
                                         )
@@ -976,20 +976,20 @@ class Economy(Cog_Extension):
                             await embed_[0].delete() #刪除loading訊息
                             await embed_[1].delete(); return #刪除先前創建之Webhook
 
-            存額等階_data = await core.economy.存額_data(銀行等階)
+            存額等階_data = await Core.economy.存額_data(銀行等階)
             銀行等階圖示 = 存額等階_data[0]           
 
-            await core.economy.update_bank(
+            await Core.economy.update_bank(
                     ctx.author, 
                     要扣的錢, 
                     '現金'
             )
-            await core.economy.update_bank(
+            await Core.economy.update_bank(
                     ctx.author, 
                     new_存款額度 , 
                     '存款額度'
             )
-            await core.economy.update_bank(
+            await Core.economy.update_bank(
                     ctx.author, 
                     1, 
                     '銀行等階'
@@ -1043,7 +1043,7 @@ class Economy(Cog_Extension):
                     await embed_[1].delete() #刪除先前創建之Webhook
 
             else:
-                    users = await core.economy.get_bank_data(ctx.author)
+                    users = await Core.economy.get_bank_data(ctx.author)
                     現金 = int(users[0]) 
                     利息等階 = int(users[7]) 
                     NEW_利息 = int(users[5])
@@ -1106,13 +1106,13 @@ class Economy(Cog_Extension):
                         await embed_[0].delete() #刪除loading訊息
                         await embed_[1].delete(); return #刪除先前創建之Webhook
                     
-                    await core.economy.update_bank(ctx.author, 要扣的錢,'現金')
-                    await core.economy.update_bank(ctx.author,0.1,'利息')
-                    await core.economy.update_bank(ctx.author, 1,'利息等階')
-                    users = await core.economy.get_bank_data(ctx.author)
+                    await Core.economy.update_bank(ctx.author, 要扣的錢,'現金')
+                    await Core.economy.update_bank(ctx.author,0.1,'利息')
+                    await Core.economy.update_bank(ctx.author, 1,'利息等階')
+                    users = await Core.economy.get_bank_data(ctx.author)
                     利息等階 = int(users[7]) 
                     NEW_利息 = math.ceil(users[5], 3)
-                    利息等階_data = await core.economy.利息_data(利息等階)
+                    利息等階_data = await Core.economy.利息_data(利息等階)
                     webhook = await ctx.channel.create_webhook(name = "CC-OSV-WebHook")
                     embed=discord.Embed(title='<a:V_:858154997640331274> 成功執行！', description=f'{ctx.author.mention} 你已晉升至{利息等階_data[0]}**{利息等階_data[1]}**。你的銀行利息變更為**{math.floor(NEW_利息-1, 2)*100}%**/**每小時**', color=MAIN_COLOR)
                     await webhook.send(
@@ -1154,15 +1154,15 @@ class Economy(Cog_Extension):
     @commands.cooldown(1, 10, commands.BucketType.user)
     @commands.guild_only()
     async def _withdraw(self, ctx, *,amount= None):
-        users = await core.economy.get_bank_data(ctx.author)
-        embed_ = await core.economy.loading(ctx)  #發送Loading訊息
+        users = await Core.economy.get_bank_data(ctx.author)
+        embed_ = await Core.economy.loading(ctx)  #發送Loading訊息
 
         if amount.lower() == 'all' or amount.lower() == 'max':
-            await core.economy.update_bank(
+            await Core.economy.update_bank(
                     ctx.author, 
                     +1*int(users[1])
             )
-            await core.economy.update_bank(
+            await Core.economy.update_bank(
                     ctx.author, 
                     -1*int(users[1]), 
                     '銀行餘額'
@@ -1232,11 +1232,11 @@ class Economy(Cog_Extension):
                 )
             await webhook.delete(); return
 
-        await core.economy.update_bank(
+        await Core.economy.update_bank(
                 ctx.author, 
                 +1 * int(amount)
         )
-        await core.economy.update_bank(
+        await Core.economy.update_bank(
                 ctx.author, 
                 -1 * int(amount), 
                 '銀行餘額'
@@ -1270,9 +1270,9 @@ class Economy(Cog_Extension):
     @commands.cooldown(1, 10, commands.BucketType.user)
     @commands.guild_only()
     async def _deposit(self, ctx, *,amount= None):
-        embed_ = await core.economy.loading(ctx)  #發送Loading訊息
+        embed_ = await Core.economy.loading(ctx)  #發送Loading訊息
 
-        users = await core.economy.get_bank_data(ctx.author)
+        users = await Core.economy.get_bank_data(ctx.author)
 
         if amount.lower() == 'all' or amount.lower() == 'max':
             if int(users[0]) > int(users[4]) - int(users[1]):
@@ -1297,8 +1297,8 @@ class Economy(Cog_Extension):
                 await embed_[0].delete() #刪除loading訊息
                 await embed_[1].delete(); return #刪除先前創建之Webhook
               
-            await core.economy.update_bank(ctx.author, -1*int(users[0]))
-            await core.economy.update_bank(ctx.author, +1*int(users[0]), '銀行餘額')
+            await Core.economy.update_bank(ctx.author, -1*int(users[0]))
+            await Core.economy.update_bank(ctx.author, +1*int(users[0]), '銀行餘額')
             webhook = await ctx.channel.create_webhook(name = "CC-OSV-WebHook")
             embed=discord.Embed(
                     title = ':warning: 錯誤！', 
@@ -1389,16 +1389,16 @@ class Economy(Cog_Extension):
                 await embed_[0].delete() #刪除loading訊息
                 await embed_[1].delete(); return #刪除先前創建之Webhook
 
-            await core.economy.update_bank(
+            await Core.economy.update_bank(
                     ctx.author, 
                     -1 * int(amount)
             )
-            await core.economy.update_bank(
+            await Core.economy.update_bank(
                     ctx.author, 
                     +1 * int(amount), 
                     '銀行餘額'
             )
-            users = await core.economy.get_bank_data(ctx.author)
+            users = await Core.economy.get_bank_data(ctx.author)
             webhook = await ctx.channel.create_webhook(name = "CC-OSV-WebHook")
             embed=discord.Embed(
                     title = '<a:V_:858154997640331274> 成功執行！', 

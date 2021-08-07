@@ -1,6 +1,6 @@
-import discord, os, asyncio, random, core.economy, core.Miner
+import discord, os, asyncio, random, Core.economy, Core.Miner
 from discord.ext import commands
-from core.classes import Cog_Extension
+from Core.classes import Cog_Extension
 from config import *
 from pymongo import MongoClient
 
@@ -69,7 +69,7 @@ class Miner():
                         await message.remove_reaction(str(reaction.emoji), ctx.author)
                     except discord.errors.Forbidden:
                         pass
-                    users = await core.economy.get_bank_data()
+                    users = await Core.economy.get_bank_data()
                     if str(reaction.emoji) == "1️⃣":
                         月薪 = 22000
                         扣錢 = 500000
@@ -111,8 +111,8 @@ class Miner():
                     elif str(choose) == "🟥":
                         品階 = "UR工人"    
                     await ctx.send(f"你已雇用了**{品階}等級**的工人，花費了**{扣錢}元**。且其月薪為**{月薪}**元")    
-                    await core.economy.update_bank(ctx.author,扣錢)
-                    await core.Miner.set.miner(ctx.author,1,品階)
+                    await Core.economy.update_bank(ctx.author,扣錢)
+                    await Core.Miner.set.miner(ctx.author,1,品階)
 
     def print_board(board):
             col_width = max(len(str(word)) for row in board for word in row) + 2  # padding
@@ -126,8 +126,8 @@ class Mine(Cog_Extension):
     @commands.cooldown(1, 10, commands.BucketType.user)
     @commands.command(aliases=['m'])
     async def mine(self, ctx, commands = None):
-        await core.Miner.open_mine(ctx.author)
-        await core.economy.open_bank(ctx.author)
+        await Core.Miner.open_mine(ctx.author)
+        await Core.economy.open_bank(ctx.author)
         if commands is None:
             embeds = Mine_GUI()
             embeds = embeds.layer_1_embed()

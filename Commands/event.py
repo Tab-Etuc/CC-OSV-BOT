@@ -1,12 +1,10 @@
 from discord.ext import commands
-from core.classes import Cog_Extension, Gloable_Data
-from core.errors import Errors
+from Core.classes import Cog_Extension, Gloable_Data
+from Core.errors import Errors
 import discord
 from config import *
-import googletrans
 
-tr = googletrans.Translator()
-DEFAULT_LANGUAGE = "zh-tw"
+
 
 class Event(Cog_Extension):
     @commands.Cog.listener()

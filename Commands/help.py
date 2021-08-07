@@ -3,7 +3,7 @@ from discord.ext import commands
 from config import *
 from disputils import BotEmbedPaginator, BotConfirmation, BotMultipleChoice
 from help import *
-from core.classes import Cog_Extension
+from Core.classes import Cog_Extension
 
 category_list = ""
 total_cmds = 0

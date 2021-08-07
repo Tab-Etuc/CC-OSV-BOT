@@ -1,7 +1,7 @@
 import discord 
 from discord import Embed
 from discord.ext import commands
-from core.classes import Cog_Extension
+from Core.classes import Cog_Extension
 import asyncio, os, re
 from config import *
 
@@ -22,8 +22,8 @@ class Owner(Cog_Extension):
         return await res.json()
 
   @commands.cooldown(1, 10, commands.BucketType.user)
-  @commands.command()
-  async def run(self, ctx: commands.Context, *, codeblock: str = None):
+  @commands.command(aliases=['run'.casefold()])
+  async def _run(self, ctx: commands.Context, *, codeblock: str = None):
         if codeblock == None:
             await ctx.reply(embed = discord.Embed(
                 title = "Incorrect Usage!",
@@ -64,7 +64,7 @@ class Owner(Cog_Extension):
         #            url = await create_guest_paste_bin(self.session, output)
         #            return await message.edit("Your output was too long, so here's the pastebin link " + url)
         embed = Embed(
-            title=f"Ran your `{result['language']}` code",
+            title=f"Ran your   `{result['language']}`   code",
             color=MAIN_COLOR)
         output = output[:500]
         shortened = len(output) > 500
@@ -80,9 +80,9 @@ class Owner(Cog_Extension):
             content="Done!",
             embed=embed)
 
-  @commands.command(aliases=['cc'])
+  @commands.command(aliases=['cc'.casefold(), 'clear'.casefold()])
   @commands.has_permissions(administrator=True)
-  async def clear(self, ctx, num: int, reason=None):
+  async def _clear(self, ctx, num: int, reason=None):
         '''清理指定數量訊息'''
         await ctx.channel.purge(limit=num + 1)
         
@@ -94,24 +94,26 @@ class Owner(Cog_Extension):
         if reason is not None:
             if reason in levels.keys():
                 await ctx.send(f'已清理 {num} 則訊息.\nReason: {levels[reason]}')
+            else:
+                await ctx.send(f'已清理 {num} 則訊息.\nReason: {levels[reason]}')
         else:
             await ctx.send(f'已清理 {num} 則訊息.\nReason: {reason}', delete_after=5.0)
             
-  @commands.command()
+  @commands.command(aliases=['load'.casefold()])
   @commands.has_permissions(administrator=True)
-  async def load(self, ctx, extension):
+  async def _load(self, ctx, extension):
     self.bot.load_extension(f'Commands.{extension}')
     await ctx.send(f'Loaded {extension} done.')
 
-  @commands.command()
+  @commands.command(aliases=['unload'.casefold()])
   @commands.has_permissions(administrator=True)
-  async def unload(self, ctx, extension):
+  async def _unload(self, ctx, extension):
     self.bot.unload_extension(f'Commands.{extension}')
     await ctx.send(f'Un - Loaded {extension} done.')
 
-  @commands.command()
+  @commands.command(aliases=['reload'.casefold()])
   @commands.has_permissions(administrator=True)
-  async def reload(self, ctx, extension):
+  async def _reload(self, ctx, extension):
     if extension == '*':
       for filename in os.listdir('./Commands'):
         if filename.endswith('.py'):
@@ -121,9 +123,9 @@ class Owner(Cog_Extension):
       self.bot.reload_extension(f'Commands.{extension}')
       await ctx.send(f'Re - Loaded {extension} done.')
 
-  @commands.command()
+  @commands.command(aliases=['shutdown'.casefold()])
   @commands.has_permissions(administrator=True)
-  async def shutdown(self, ctx):
+  async def _shutdown(self, ctx):
     await ctx.send("Shutting down...")
     await asyncio.sleep(1)
     await self.bot.logout()

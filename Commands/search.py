@@ -1,7 +1,7 @@
 import discord
 import json, datetime
 from discord.ext import commands
-from core.classes import Cog_Extension
+from Core.classes import Cog_Extension
 from config import *
 
 SearchData = {

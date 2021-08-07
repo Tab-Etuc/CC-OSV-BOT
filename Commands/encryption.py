@@ -7,7 +7,7 @@ from discord.ext import commands
 from discord.ext.commands import clean_content
 from discord.ext.commands.errors import BadArgument
 from utils import default, http
-from core.classes import Cog_Extension
+from Core.classes import Cog_Extension
 
 
 async def detect_file(ctx):
