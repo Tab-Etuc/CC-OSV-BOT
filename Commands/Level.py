@@ -96,7 +96,7 @@ class Level(Cog_Extension):
         rankings = levelling.find({"guildid": ctx.guild.id}).sort("xp", -1)
         i = 1
         con = leaderboard_amount
-        embed = discord.Embed(title=f":trophy: 排行榜 | Top {con}", colour=MAIN_COLOR = 0xa8e1fa)
+        embed = discord.Embed(title=f":trophy: 排行榜 | Top {con}", colour=MAIN_COLOR)
         for x in rankings:
             try:
                 temp = ctx.guild.get_member(x["id"])
