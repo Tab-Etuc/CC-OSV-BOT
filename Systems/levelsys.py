@@ -3,7 +3,6 @@ import asyncio
 import discord
 from discord.ext import commands
 from pymongo import MongoClient
-from ruamel.yaml import YAML
 import vacefron
 import os
 from dotenv import load_dotenv

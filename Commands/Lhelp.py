@@ -1,7 +1,6 @@
 import asyncio
 import discord
 from discord.ext import commands
-from ruamel.yaml import YAML
 from Core.classes import Cog_Extension
 
 
