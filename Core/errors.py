@@ -50,7 +50,7 @@ class Errors():
     elif "You are on cooldown. Try again in "in str(error):
       embed=discord.Embed(title=":warning: 錯誤！", description="指令還在冷卻中！請於%.2f秒後再次嘗試。"% error.retry_after, color=ORANGE_COLOR)
       await ctx.send(embed=embed)
-    elif " is not found"in str(error):
+    elif "is not found"in str(error):
       pass
 
       
