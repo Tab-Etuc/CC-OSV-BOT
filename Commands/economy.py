@@ -1301,9 +1301,9 @@ class Economy(Cog_Extension):
             await Core.economy.update_bank(ctx.author, +1*int(users[0]), '銀行餘額')
             webhook = await ctx.channel.create_webhook(name = "CC-OSV-WebHook")
             embed=discord.Embed(
-                    title = ':warning: 錯誤！', 
+                    title = '<a:V_:858154997640331274> 成功執行！', 
                     description = f'{ctx.author.mention} 你存入了 {users[0]}元 至你的銀行。', 
-                    color = ORANGE_COLOR
+                    color = MAIN_COLOR
             )
             await webhook.send(
                         embed = embed, 
