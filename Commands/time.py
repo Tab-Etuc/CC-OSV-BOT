@@ -14,8 +14,8 @@ class Time(commands.Cog):
         now2 = datetime.now(tz).strftime("📅次年●%m月%d日●")
         now = datetime.now(tz).strftime("🕠現在時刻： %H 點")
         guild = self.bot.get_guild(869781588483924069)
-        member_count = len(ctx.guild.members) # includes bots
-        true_member_count = len([m for m in ctx.guild.members if not m.bot])
+        member_count = len(guild.members) # includes bots
+        true_member_count = len([m for m in guild.members if not m.bot])
         
         channel = self.bot.get_channel(852346393141182484) # ID des Channels
         channel2 = self.bot.get_channel(852364573095755808)
