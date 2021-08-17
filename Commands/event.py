@@ -27,7 +27,7 @@ class Event(Cog_Extension):
         if data.message_id in 添加身分組:
           print(data.message_id)
           print(添加身分組[data.message_id]['Emoji'])
-          if str(data.emoji.id) in 添加身分組[data.message_id]['Emoji']:
+          if str(data.emoji.id) in 添加身分組[data.message_id][str(data.emoji.id)+'Emoji']:
                 print(添加身分組[data.message_id]['Emoji'])
                 guild = self.bot.get_guild(data.guild_id)
                 user = await guild.fetch_member(data.user_id)
@@ -61,7 +61,7 @@ class Event(Cog_Extension):
     async def on_raw_reaction_remove(self, data):
       try:        
         if data.message_id in 添加身分組:
-            if str(data.emoji.id) in 添加身分組[data.message_id]['Emoji']:
+            if str(data.emoji.id) in 添加身分組[data.message_id][str(data.emoji.id)+'Emoji']:
                 guild = self.bot.get_guild(data.guild_id)
                 user = await guild.fetch_member(data.user_id)
                 role = guild.get_role(int(添加身分組[data.message_id][str(data.emoji.id)+'(role)']))
