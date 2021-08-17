@@ -26,6 +26,7 @@ class Event(Cog_Extension):
       try:   
         if data.message_id in 添加身分組:
           print(data.message_id)
+          print(添加身分組[data.message_id]['Emoji'])
           if str(data.emoji.id) in 添加身分組[data.message_id]['Emoji']:
                 print(添加身分組[data.message_id]['Emoji'])
                 guild = self.bot.get_guild(data.guild_id)
