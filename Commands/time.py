@@ -14,8 +14,7 @@ class Time(commands.Cog):
         now2 = datetime.now(tz).strftime("📅次年●%m月%d日●")
         now = datetime.now(tz).strftime("🕠現在時刻： %H 點")
         guild = self.bot.get_guild(869781588483924069)
-        member_count = len(guild.members) # includes bots
-        true_member_count = len([m for m in guild.members if not m.bot])
+        a = guild.member_count
         
         channel = self.bot.get_channel(852346393141182484) # ID des Channels
         channel2 = self.bot.get_channel(852364573095755808)
@@ -33,7 +32,7 @@ class Time(commands.Cog):
         await asyncio.sleep(1)
         await channel4.edit(name=now)# Füge hier den ersten Channel Namen ein zu dem gewechselt werden soll.      
         await asyncio.sleep(1)
-        await channel5.edit(name='馬卡島成員數：' + true_member_count)# Füge hier den ersten Channel Namen ein zu dem gewechselt werden soll.      
+        await channel5.edit(name='馬卡島成員數：' + a)# Füge hier den ersten Channel Namen ein zu dem gewechselt werden soll.      
         await asyncio.sleep(310) # Hier die sleep dauer // Nicht unter 300 [Discord - RateLimit]
     self.bg_task = self.bot.loop.create_task(interval())
 
