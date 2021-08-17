@@ -22,7 +22,9 @@ class Time(commands.Cog):
         await channel.edit(name=now) # Füge hier den ersten Channel Namen ein zu dem gewechselt werden soll.
         await asyncio.sleep(1)
         await channel2.edit(name=now2)
+        await asyncio.sleep(1)
         await channel3.edit(name=now2)
+        await asyncio.sleep(1)
         await channel4.edit(name=now)# Füge hier den ersten Channel Namen ein zu dem gewechselt werden soll.        
         await asyncio.sleep(310) # Hier die sleep dauer // Nicht unter 300 [Discord - RateLimit]
     self.bg_task = self.bot.loop.create_task(interval())
