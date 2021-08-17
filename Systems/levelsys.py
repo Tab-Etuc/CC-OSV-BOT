@@ -17,7 +17,7 @@ cluster = MongoClient(MONGODB_URI)
 levelling = cluster['discord']['levelling']
 
 vac_api = vacefron.Client()
-
+Prefix = 'C'
 
 class levelsys(commands.Cog):
 
