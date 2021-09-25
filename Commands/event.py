@@ -23,6 +23,9 @@ class Event(Cog_Extension):
 
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, data):
+      print(data.message_id)
+      print(data.emoji)
+
       try:   
         if data.message_id in 添加身分組:
           if str(data.emoji.id) in 添加身分組[data.message_id][str(data.emoji.id)+'Emoji']:
