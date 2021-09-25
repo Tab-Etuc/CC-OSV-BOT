@@ -52,7 +52,7 @@ class Event(Cog_Extension):
                 role = guild.get_role(863630245630443551)
                 await user.add_roles(role)
                 await user.send('您已獲得進入晚餐揪揪群之通行證。')   
-      if data.message_id = 858160262606880818: 
+      elif data.message_id = 858160262606880818: 
             if str(data.emoji) == '858154997640331274':
                 guild = self.bot.get_guild(data.guild_id)
                 user = await guild.fetch_member(data.user_id)
