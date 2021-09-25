@@ -23,9 +23,6 @@ class Event(Cog_Extension):
 
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, data):
-      print(data.message_id)
-      print(data.emoji)
-
       try:   
         if data.message_id in 添加身分組:
           if str(data.emoji.id) in 添加身分組[data.message_id][str(data.emoji.id)+'Emoji']:
@@ -56,7 +53,7 @@ class Event(Cog_Extension):
                 await user.add_roles(role)
                 await user.send('您已獲得進入晚餐揪揪群之通行證。')   
       if data.message_id == 858160262606880818: 
-            if str(data.emoji) == '858154997640331274':
+            if str(data.emoji.id) == '858154997640331274':
                 guild = self.bot.get_guild(data.guild_id)
                 user = await guild.fetch_member(data.user_id)
                 role = guild.get_role(863629520719839242)
