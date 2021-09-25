@@ -58,7 +58,7 @@ class Event(Cog_Extension):
                 user = await guild.fetch_member(data.user_id)
                 role = guild.get_role(863629520719839242)
                 await user.add_roles(role)
-                rol2 = guild.get_role(834430171171258417)
+                rol2 = guild.get_role(891233331096723476)
                 await user.add_roles(rol2)
                 await user.send('您已成功進入我國國境。')             
 
